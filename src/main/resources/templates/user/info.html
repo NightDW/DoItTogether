@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}"></title>
+
+    <!-- 引入fragments.css文件 -->
+    <link th:replace="fragments::fragmentsCSS" />
+
+    <!-- 引入本页面对应的css文件 -->
+    <link th:href="@{/css/user/info.css}" rel="stylesheet">
+
+    <!-- 引入片段中的Bootstrap -->
+    <link th:replace="fragments::bootstrap" />
+
+</head>
+<body>
+
+<!-- 引入导航条 -->
+<div th:replace="fragments::nevigate"></div>
+
+<!-- 在此添加页面主体信息 -->
+<div class="container">
+
+    <form id="form" class="form-inline" th:action="@{/} + (${title} eq 'Register' ? 'register' : 'user')" method="post">
+        <h2 class="form-signin-heading" th:text="${readOnly != null && readOnly ? 'User detail' : 'Please enter your info'}"></h2>
+
+        <!-- 如果不是注册，则需要修改提交方式为PUT -->
+        <input th:if="${title} ne 'Register'" type="hidden" name="_method" value="put" />
+
+        <div class="form-group">
+            <label for="username">Username: </label>
+            <input id="username" name="username" type="text" class="form-control" placeholder="Username" th:value="${user == null || user.username == null} ? _ : ${user.username}" th:readonly="${readOnly != null && readOnly}">
+        </div>
+
+        <div class="form-group" th:if="${readOnly == null || !readOnly}">
+            <label for="password">Password: </label>
+            <input id="password" name="password" type="password" class="form-control" placeholder="Password" th:value="${user == null || user.password == null} ? _ : ${user.password}">
+        </div>
+
+        <div class="form-group" th:if="${readOnly == null || !readOnly}">
+            <label for="confirm">Confirm: </label>
+            <input id="confirm" name="confirm" type="password" class="form-control" placeholder="Confirm Password">
+        </div>
+
+        <div class="form-group">
+            <label for="introduction">Introduction: </label>
+            <input id="introduction" name="introduction" type="text" class="form-control" placeholder="Introduction" th:value="${user == null || user.introduction == null} ? _ : ${user.introduction}" th:readonly="${readOnly != null && readOnly}">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email: </label>
+            <input id="email" name="email" type="email" class="form-control" placeholder="Email" th:value="${user == null || user.email == null} ? _ : ${user.email}" th:readonly="${readOnly != null && readOnly}">
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone: </label>
+            <input id="phone" name="phone" type="number" class="form-control" placeholder="Phone" th:value="${user == null || user.phone == null} ? _ : ${user.phone}" th:readonly="${readOnly != null && readOnly}">
+        </div>
+
+        <div class="form-group">
+            <label>Gender: </label>
+            <p class="form-control-static">
+                <label class="radio-inline">
+                    <input type="radio" name="gender" value="true" th:checked="${user == null || user.gender == null} ? _ : ${user.gender}" th:disabled="${readOnly != null && readOnly}"> Man
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="gender" value="false" th:checked="${user == null || user.gender == null} ? _ : ${!user.gender}" th:disabled="${readOnly != null && readOnly}"> Woman
+                </label>
+            </p>
+        </div>
+
+        <button th:if="${readOnly == null || !readOnly}" id="submit-btn" class="btn btn-lg btn-primary btn-block" type="button" th:text="${title} eq 'Register' ? 'Register' : 'Modify'"></button>
+    </form>
+
+</div>
+
+<!-- 引入底部信息 -->
+<div th:replace="fragments::footer"></div>
+
+<!-- 引入片段中的JQuery和Bootstrap的JS插件 -->
+<script th:replace="fragments::jquery"></script>
+<script th:replace="fragments::bootstrapJS"></script>
+
+<!-- 引入常用的函数 -->
+<script th:replace="fragments::usefulFunctions"></script>
+
+<!-- 判断用户输入是否合法 -->
+<script>
+    $("#submit-btn").click(function () {
+        var username = $("#username").val();
+        var password = $("#password").val();
+        var confirm = $("#confirm").val();
+        var email = $("#email").val();
+        var phone = $("#phone").val();
+        var gender = $('input[name="gender"]:checked').val();
+        if(isEmptyStr(username) || isEmptyStr(password) || isEmptyStr(confirm) || isEmptyStr(email) || isEmptyStr(phone) || isEmptyStr(gender))
+            alert("Information not completed!");
+        else if(password !== confirm)
+            alert("Two password are not the same!");
+        else
+            $("#form").submit();
+    })
+</script>
+
+<!-- 使用AJAX判断信息是否被注册 -->
+<script>
+    function blurFunction(input){
+        //如果是注册，则id为空字符串，如果是修改，则需要告知服务器当前用户的id
+        var id = "[[${title} eq 'Register' ? '' : ${user.id}]]";
+        var attName = $(input).attr("name");
+        var attValue = $(input).val();
+        var data = {condition : attName + '_' + attValue, id: id};
+        $.ajax({
+            url: "/check",
+            data: data,
+            success:function(result){
+                var tarLabel = $("label[for='" + attName + "']");
+                var text = isEmptyStr(result) ? firstCharToBig(attName) + ': ' : "Duplicated! ";
+                var color = isEmptyStr(result) ? 'black' : 'red';
+                tarLabel.text(text);
+                tarLabel.attr("style", 'color:' + color + ';');
+            }
+        });
+    }
+    //页面加载完成后给3个输入框添加监听事件，并立刻调用一次
+    $(function () {
+        var username = $("#username");
+        var email = $("#email");
+        var phone = $("#phone");
+        username.attr("onblur", "blurFunction(this)");
+        email.attr("onblur", "blurFunction(this)");
+        phone.attr("onblur", "blurFunction(this)");
+        blurFunction(username);
+        blurFunction(email);
+        blurFunction(phone);
+    })
+</script>
+
+</body>
+</html>

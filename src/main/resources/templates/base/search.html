@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Search Result</title>
+
+    <!-- 引入fragments.css文件 -->
+    <link th:replace="fragments::fragmentsCSS" />
+
+    <!-- 引入本页面对应的css文件 -->
+    <link th:href="@{/css/base/search.css}" rel="stylesheet">
+
+    <!-- 引入片段中的Bootstrap -->
+    <link th:replace="fragments::bootstrap" />
+
+</head>
+<body>
+
+<!-- 引入导航条 -->
+<div th:replace="fragments::nevigate"></div>
+
+<!-- 在此添加页面主体信息 -->
+<div class="users">
+    <h2>Users</h2>
+    <p class="msg">Click the star symbol to request to be friends!</p>
+    <div th:class="'media panel panel-default ' + ${user.gender ? 'man-user' : 'woman-user'}" th:if="${user.isValid}" th:each="user : ${users}">
+        <div class="media-left media-middle">
+            <img class="icon" th:src="@{/img/} + ${user.iconUrl}" />
+        </div>
+        <div class="media-body">
+            <div>
+                <span class="glyphicon glyphicon-user"></span>
+                <span th:text="${user.username}"></span>
+                <span class="glyphicon glyphicon-star" th:if="${#authentication.principal.id != user.id}" onclick="applyButFunction(this)" th:attr="gid=${user.id}"></span>
+            </div>
+            <div>
+                <span class="glyphicon glyphicon-pencil"></span>
+                <span th:text="${user.introduction}"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="groups">
+    <h2>Groups</h2>
+    <p class="msg">Click the login symbol to join in that task group!</p>
+    <div class="media panel panel-default" th:each="group : ${groups}">
+        <div class="media-left media-middle">
+            <img class="icon" th:src="@{/img/} + ${group.iconUrl}" />
+        </div>
+        <div class="media-body">
+            <div>
+                <span class="glyphicon glyphicon-tasks"></span>
+                <span th:text="${group.name}"></span>
+                <a class="glyphicon glyphicon-log-in" th:href="@{/group/join/} + ${group.id}"></a>
+            </div>
+            <div>
+                <span class="glyphicon glyphicon-pencil"></span>
+                <span th:text="${group.slogan}"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 引入底部信息 -->
+<div th:replace="fragments::footer"></div>
+
+<!-- 引入片段中的JQuery和Bootstrap的JS插件 -->
+<script th:replace="fragments::jquery"></script>
+<script th:replace="fragments::bootstrapJS"></script>
+
+<!-- 引入常用的函数 -->
+<script th:replace="fragments::usefulFunctions"></script>
+
+<script>
+    function applyButFunction(obj) {
+        var remarks = prompt("Please tell him/her who you are:");
+        if(remarks === null)
+            return;
+        var gid = $(obj).attr("gid");
+        var data = {remarks: remarks};
+        $.ajax({
+            url: "/friend/request/" + gid,
+            data: data,
+            success:function(result){
+                var topMsg = $("#top-msg");
+                if(isEmptyStr(result))
+                    topMsg.text("Error occurred!");
+                else if(result === "OK")
+                    topMsg.text("Sent request successfully!");
+                else
+                    topMsg.text("You had been friends!");
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<!-- 本页面的参考页面及其样式：https://v3.bootcss.com/examples/signin/ -->
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <!-- 引入fragments.css文件 -->
+    <link th:replace="fragments::fragmentsCSS" />
+
+    <!-- 引入本页面对应的css文件 -->
+    <link th:href="@{/css/base/login.css}" rel="stylesheet">
+
+    <!-- 引入片段中的Bootstrap -->
+    <link th:replace="fragments::bootstrap" />
+
+</head>
+<body>
+
+<!-- 引入导航条 -->
+<div th:replace="fragments::nevigate"></div>
+
+<!-- 在此添加页面主体信息 -->
+<div class="container">
+
+    <form id="loginForm" class="form-signin" th:action="@{/login}" method="post">
+        <h2 class="form-signin-heading">Please sign in</h2>
+
+        <input name="username" type="text" class="form-control" placeholder="Username" th:value="${user == null || user.username == null} ? _ : ${user.username}">
+        <input name="password" type="password" class="form-control" placeholder="Password" th:value="${user == null || user.password == null} ? _ : ${user.password}">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="remember-me"> Remember me
+            </label>
+        </div>
+        <div class="forget">
+            <a th:href="@{/forget}">Forget password?</a>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+
+</div>
+
+<!-- 引入底部信息 -->
+<div th:replace="fragments::footer"></div>
+
+<!-- 引入片段中的JQuery和Bootstrap的JS插件 -->
+<script th:replace="fragments::jquery"></script>
+<script th:replace="fragments::bootstrapJS"></script>
+
+<!-- 引入常用的函数 -->
+<script th:replace="fragments::usefulFunctions"></script>
+
+<!-- 如果有指定自动登录且能取到用户数据，那么在页面加载完毕后自动登录 -->
+<script th:if="${auto_login != null && auto_login == true && user != null}">
+    $(document).ready(function () {
+        $("#loginForm").submit();
+    })
+</script>
+
+</body>
+</html>

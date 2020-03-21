@@ -1,0 +1,62 @@
+.form-inline {
+    max-width: 45%;
+    padding: 15px;
+    margin: 0 auto;
+}
+.form-inline .form-signin-heading{
+    text-align: center;
+}
+.form-inline .form-group{
+    width: 100%;
+    margin-top: 10px;
+    text-align: center;
+}
+.form-inline button{
+    width: 50%;
+    margin: 10px auto;
+}
+.form-inline .form-group label{
+    width: 15%;
+    text-align: center;
+    font-size: 16px;
+}
+.form-inline .form-group .form-control {
+    position: relative;
+    height: auto;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+.form-inline .form-group .form-control:focus {
+    z-index: 2;
+}
+.sons{
+    display: block;
+    width: 999px;
+    max-width: 999px;
+    text-align: center;
+}
+.sons button{
+    width: 30%;
+}
+.sons .btn-sm{
+    width: 15%;
+}
+.sons .son{
+    display: inline-block;
+    border: 1px solid #999;
+    width: 333px;
+    box-sizing: border-box;
+    padding-bottom: 20px;
+    border-radius: 10px;
+}
+.sons .son .form-group label{
+    width: 66px;
+}
+.sons .son .glyphicon{
+    font-size: 16px;
+    color: red;
+    padding: 0;
+    position: relative;
+    top: -1px;
+}

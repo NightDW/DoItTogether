@@ -1,0 +1,9 @@
+.jumbotron{
+    padding: 0 22%;
+}
+.jumbotron a{
+    width: 100px;
+}
+.jumbotron #create-group-btn{
+    width: 200px;
+}

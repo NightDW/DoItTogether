@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.laidw.mapper.FriendshipMapper">
+
+    <!-- =============================抽取SQL片段============================= -->
+
+    <!-- 表名 -->
+    <sql id="tableName">
+        t_friend
+    </sql>
+
+    <!-- 插入表时涉及的列 -->
+    <sql id="insertTableCols">
+        (host_id, guest_id, remarks, is_show, is_top)
+    </sql>
+
+    <!-- 插入表时涉及的类的属性 -->
+    <sql id="insertClassAtts">
+        (#{hostId}, #{guestPubInfo.id}, #{remarks}, #{isShow}, #{isTop})
+    </sql>
+
+    <!-- WHERE id = #{id} -->
+    <sql id="whereId">
+        WHERE id = #{id}
+    </sql>
+
+    <!-- 无条件更新的SET语句 -->
+    <sql id="updateSetting">
+        remarks = #{remarks},
+        is_show = #{isShow},
+        is_top = #{isTop},
+    </sql>
+
+    <!-- 只更新非空字段时的SET语句 -->
+    <sql id="updateSelectivelySetting">
+        <if test="remarks != null">
+            remarks = #{remarks},
+        </if>
+        <if test="isShow != null">
+            is_show = #{isShow},
+        </if>
+        <if test="isTop != null">
+            is_top = #{isTop},
+        </if>
+    </sql>
+
+    <!-- =============================抽取SQL片段============================= -->
+
+
+    <!-- =============================定义封装规则============================= -->
+
+    <resultMap id="friendshipMap" type="com.laidw.entity.Friendship">
+        <id column="id" property="id" />
+        <result column="host_id" property="hostId" />
+        <result column="remarks" property="remarks" />
+        <result column="is_show" property="isShow" />
+        <result column="is_top" property="isTop" />
+        <association property="guestPubInfo" column="guest_id"
+                     select="com.laidw.mapper.UserMapper.selectUserPubInfoById" />
+        <collection property="messages" column="{param1=host_id,param2=guest_id}"
+                    select="com.laidw.mapper.MessageMapper.selectMessagesBetween" />
+    </resultMap>
+
+    <!-- =============================定义封装规则============================= -->
+
+
+    <!-- =============================编写SQL语句============================= -->
+    <insert id="insertFriendship" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        <include refid="tableName" />
+        <include refid="insertTableCols" />
+        VALUES
+        <include refid="insertClassAtts" />
+    </insert>
+    <delete id="deleteFriendship">
+        DELETE FROM
+        <include refid="tableName" />
+        WHERE host_id = #{hid} AND guest_id = #{gid}
+    </delete>
+    <update id="updateFriendshipSelectively">
+        UPDATE
+        <include refid="tableName" />
+        <set>
+            <include refid="updateSelectivelySetting" />
+        </set>
+        WHERE host_id = #{hostId} AND guest_id = #{guestPubInfo.id}
+    </update>
+    <update id="updateFriendshipByIdSelectively">
+        UPDATE
+        <include refid="tableName" />
+        <set>
+            <include refid="updateSelectivelySetting" />
+        </set>
+        <include refid="whereId" />
+    </update>
+    <select id="selectFriendshipById" resultMap="friendshipMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        <include refid="whereId" />
+    </select>
+    <select id="selectFriendship" resultMap="friendshipMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE host_id = #{hid} AND guest_id = #{gid}
+    </select>
+    <select id="selectFriendshipsByHostId" resultMap="friendshipMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE host_id = #{hid}
+    </select>
+    <!-- =============================编写SQL语句============================= -->
+
+</mapper>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.laidw.mapper.GroupMapper">
+
+    <!-- =============================抽取SQL片段============================= -->
+
+    <!-- 表名 -->
+    <sql id="tableName">
+        t_group
+    </sql>
+
+    <!-- 插入表时涉及的列 -->
+    <sql id="insertTableCols">
+        (name, slogan, icon_url)
+    </sql>
+
+    <!-- 插入表时涉及的类的属性 -->
+    <sql id="insertClassAtts">
+        (#{name}, #{slogan}, #{iconUrl})
+    </sql>
+
+    <!-- WHERE id = #{id} -->
+    <sql id="whereId">
+        WHERE id = #{id}
+    </sql>
+
+    <!-- 无条件更新的SET语句 -->
+    <sql id="updateSetting">
+        name = #{name},
+        slogan = #{slogan},
+        icon_url = #{iconUrl},
+    </sql>
+
+    <!-- 只更新非空字段时的SET语句 -->
+    <sql id="updateSelectivelySetting">
+        <if test="name != null">
+            name = #{name},
+        </if>
+        <if test="slogan != null">
+            slogan = #{slogan},
+        </if>
+        <if test="iconUrl != null">
+            icon_url = #{iconUrl},
+        </if>
+    </sql>
+
+    <!-- =============================抽取SQL片段============================= -->
+
+
+    <!-- =============================定义封装规则============================= -->
+
+    <resultMap id="onlyPubInfoMap" type="com.laidw.entity.Group">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="slogan" property="slogan" />
+        <result column="icon_url" property="iconUrl" />
+    </resultMap>
+
+    <resultMap id="fullMap" type="com.laidw.entity.Group" extends="onlyPubInfoMap">
+        <collection property="memberships" column="id"
+                    select="com.laidw.mapper.MembershipMapper.selectMembershipsPubInfoByGroupId" />
+        <collection property="messages" column="id"
+                    select="com.laidw.mapper.MessageMapper.selectMessagesByGroupId" />
+        <collection property="tasks" column="id"
+                    select="com.laidw.mapper.TaskMapper.selectRootTasksByGroupId" />
+    </resultMap>
+
+    <!-- =============================定义封装规则============================= -->
+
+
+    <!-- =============================编写SQL语句============================= -->
+    <insert id="insertGroup" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        <include refid="tableName" />
+        <include refid="insertTableCols" />
+        VALUES
+        <include refid="insertClassAtts" />
+    </insert>
+    <delete id="deleteGroupById">
+        DELETE FROM
+        <include refid="tableName" />
+        <include refid="whereId" />
+    </delete>
+    <update id="updateGroupByIdSelectively">
+        UPDATE
+        <include refid="tableName" />
+        <set>
+            <include refid="updateSelectivelySetting" />
+        </set>
+        <include refid="whereId" />
+    </update>
+    <select id="selectGroupById" resultMap="fullMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        <include refid="whereId" />
+    </select>
+    <select id="selectGroupPubInfoById" resultMap="onlyPubInfoMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        <include refid="whereId" />
+    </select>
+    <select id="searchGroupsLike" resultMap="onlyPubInfoMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE name LIKE #{key} OR slogan LIKE #{key}
+    </select>
+    <select id="searchGroupsByKey" resultMap="onlyPubInfoMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE name = #{key} OR slogan = #{key}
+    </select>
+    <!-- =============================编写SQL语句============================= -->
+
+</mapper>

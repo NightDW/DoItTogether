@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Joined Groups</title>
+
+    <!-- 引入fragments.css文件 -->
+    <link th:replace="fragments::fragmentsCSS" />
+
+    <!-- 引入本页面对应的css文件 -->
+    <link th:href="@{/css/group/list.css}" rel="stylesheet">
+
+    <!-- 引入片段中的Bootstrap -->
+    <link th:replace="fragments::bootstrap" />
+
+</head>
+<body>
+
+<!-- 引入导航条 -->
+<div th:replace="fragments::nevigate"></div>
+
+<!-- 在此添加页面主体信息 -->
+<div class="groups">
+    <div th:each="membership : ${memberships}" class="group">
+        <div class="media panel panel-default">
+            <div class="media-left media-middle">
+                <img class="icon" th:src="@{/img/} + ${membership.groupPubInfo.iconUrl}" />
+            </div>
+            <div class="media-body">
+                <h3>
+                    <a th:href="@{/group/} + ${membership.groupPubInfo.id}" th:text="${membership.groupPubInfo.name}"></a>
+                    <small th:text="${membership.groupPubInfo.slogan}"></small>
+                </h3>
+                <p>
+                    <span>Your nickname in this group: </span>
+                    <input th:value="${membership.nickname}" placeholder="Set your nickname" onblur="setNickname(this)" th:attr="mid=${membership.id}" />
+                </p>
+                <p>
+                    <span>Your role in this group: </span>
+                    <span th:text="${membership.role}"></span>
+                </p>
+                <span class="glyphicons">
+                    <span th:class="'glyphicon glyphicon-volume-' + ${membership.isMute ? 'off' : 'up'}"></span>
+                    <a th:href="@{/membership/view/} + ${membership.id} + ${membership.isTop ? '/10' : '/11'} "><span th:class="'glyphicon glyphicon-star' + ${membership.isTop ? '' : '-empty'}"></span></a>
+                    <a th:href="@{/membership/view/} + ${membership.id} + ${membership.isShow ? '/00' : '/01'} "><span th:class="'glyphicon glyphicon-eye-' + ${membership.isShow ? 'open' : 'close'}"></span></a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 引入底部信息 -->
+<div th:replace="fragments::footer"></div>
+
+<!-- 引入片段中的JQuery和Bootstrap的JS插件 -->
+<script th:replace="fragments::jquery"></script>
+<script th:replace="fragments::bootstrapJS"></script>
+
+<!-- 引入常用的函数 -->
+<script th:replace="fragments::usefulFunctions"></script>
+
+<script>
+    function setNickname(obj) {
+        var mid = $(obj).attr("mid");
+        var nicknameStr = $(obj).val();
+        $.ajax({
+            url: "/membership/nickname/" + mid,
+            data: {nickname: nicknameStr},
+            success:function(result){
+                $("#top-msg").text(!isEmptyStr(result) && result === "OK" ? 'Changed nickname successfully!': 'Failed to change nickname!');
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

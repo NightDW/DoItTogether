@@ -1,0 +1,65 @@
+body{
+    padding-bottom: 0 !important;
+}
+a:hover{
+    text-decoration: none;
+}
+.media .icon{
+    width: 50px;
+    height: 50px;
+}
+.messages{
+    width: 50%;
+    margin: 25px auto;
+    margin-bottom: 0;
+}
+.messages .top-part{
+    background-color: #eee;
+    overflow-y: auto;
+    height: 495px;
+    padding: 2%;
+    position: relative;
+}
+.messages .top-part .refresh{
+    position: absolute;
+    font-size: 16px;
+    top: 10px;
+    left: 15px;
+}
+.messages .top-part .media{
+    max-width: 66%;
+}
+.messages .top-part .media .media-body{
+    padding: 8px 20px;
+    border-radius: 20px;
+    background-color: white;
+}
+.messages .top-part .other-msg{
+    float: left;
+}
+.messages .top-part .my-msg{
+    float: right;
+}
+.messages .top-part .my-msg .media-body{
+    text-align: right;
+    background-color: greenyellow;
+}
+.messages .top-part .msg-content{
+    margin-bottom: 0;
+}
+.messages .bottom-part{
+    height: 40px;
+    margin-top: 20px;
+}
+.messages .bottom-part input{
+    float: right;
+    height: 100%;
+    width: 90%;
+    max-width: 598px;
+    font-size: 16px;
+    padding-left: 5px;
+}
+.messages .bottom-part button{
+    float: right;
+    height: 100%;
+}

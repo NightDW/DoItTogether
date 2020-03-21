@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${group == null || group.id == null} ? 'Create Group' : 'Modify Group'"></title>
+
+    <!-- 引入fragments.css文件 -->
+    <link th:replace="fragments::fragmentsCSS" />
+
+    <!-- 引入本页面对应的css文件 -->
+    <link th:href="@{/css/group/info.css}" rel="stylesheet">
+
+    <!-- 引入片段中的Bootstrap -->
+    <link th:replace="fragments::bootstrap" />
+
+</head>
+<body>
+
+<!-- 引入导航条 -->
+<div th:replace="fragments::nevigate"></div>
+
+<!-- 在此添加页面主体信息 -->
+<div class="container">
+
+    <form id="form" class="form-inline" th:action="@{/group}" method="post">
+        <h2 class="form-signin-heading">Please enter group info</h2>
+
+        <!-- 如果不是创建，则需要修改提交方式为PUT -->
+        <input th:if="${group != null && group.id != null}" type="hidden" name="_method" value="put" />
+
+        <div class="form-group">
+            <label for="name">Name: </label>
+            <input id="name" name="name" type="text" class="form-control" placeholder="Group Name" th:value="${group == null || group.name == null} ? _ : ${group.name}">
+        </div>
+
+        <div class="form-group">
+            <label for="slogan">Slogan: </label>
+            <input id="slogan" name="slogan" type="text" class="form-control" placeholder="Group Slogan" th:value="${group == null || group.slogan == null} ? _ : ${group.slogan}">
+        </div>
+
+        <button id="submit-btn" class="btn btn-lg btn-primary btn-block" type="submit" th:text="${group == null || group.id == null} ? 'Create' : 'Modify'"></button>
+    </form>
+
+</div>
+
+<!-- 引入底部信息 -->
+<div th:replace="fragments::footer"></div>
+
+<!-- 引入片段中的JQuery和Bootstrap的JS插件 -->
+<script th:replace="fragments::jquery"></script>
+<script th:replace="fragments::bootstrapJS"></script>
+
+<!-- 引入常用的函数 -->
+<script th:replace="fragments::usefulFunctions"></script>
+
+</body>
+</html>

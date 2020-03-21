@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Find Back Your Account Info</title>
+
+    <!-- 引入fragments.css文件 -->
+    <link th:replace="fragments::fragmentsCSS" />
+
+    <!-- 引入本页面对应的css文件 -->
+    <link th:href="@{/css/base/forget.css}" rel="stylesheet">
+
+    <!-- 引入片段中的Bootstrap -->
+    <link th:replace="fragments::bootstrap" />
+
+</head>
+<body>
+
+<!-- 引入导航条 -->
+<div th:replace="fragments::nevigate"></div>
+
+<!-- 在此添加页面主体信息 -->
+<div class="container">
+
+    <form id="findBackForm" class="form-inline" th:action="@{/forget}" method="post">
+        <h2 class="form-signin-heading">Please provide your info</h2>
+
+        <p class="msg">Tips: fill in one of these items</p>
+        <p class="msg">Priority: username &gt; email &gt; phone</p>
+
+        <div class="form-group">
+            <label for="username">Username: </label>
+            <input id="username" name="username" type="text" class="form-control" placeholder="Username" th:value="${user == null ? _ : user.username}">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email: </label>
+            <input id="email" name="email" type="email" class="form-control" placeholder="Email" th:value="${user == null ? _ : user.email}">
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone: </label>
+            <input id="phone" name="phone" type="number" class="form-control" placeholder="Phone" th:value="${user == null ? _ : user.phone}">
+        </div>
+
+        <button class="btn btn-lg btn-primary btn-block" onclick="findBackButClick()" type="button">Find back</button>
+    </form>
+
+</div>
+
+<!-- 引入底部信息 -->
+<div th:replace="fragments::footer"></div>
+
+<!-- 引入片段中的JQuery和Bootstrap的JS插件 -->
+<script th:replace="fragments::jquery"></script>
+<script th:replace="fragments::bootstrapJS"></script>
+
+<!-- 引入常用的函数 -->
+<script th:replace="fragments::usefulFunctions"></script>
+
+<script>
+    function findBackButClick() {
+        if(isEmptyStr($("#username").val()) && isEmptyStr($("#email").val()) && isEmptyStr($("#phone").val()))
+            alert("You must provide at least one of your info!");
+        else
+            $("#findBackForm").submit();
+    }
+</script>
+
+</body>
+</html>

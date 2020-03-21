@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${friendship.guestPubInfo.username}"></title>
+
+    <!-- 引入fragments.css文件 -->
+    <link th:replace="fragments::fragmentsCSS" />
+
+    <!-- 引入本页面对应的css文件 -->
+    <link th:href="@{/css/user/talk.css}" rel="stylesheet">
+
+    <!-- 引入片段中的Bootstrap -->
+    <link th:replace="fragments::bootstrap" />
+
+</head>
+<body>
+
+<!-- 引入导航条 -->
+<div th:replace="fragments::nevigate"></div>
+
+
+<!-- 在此添加页面主体信息 -->
+<div class="main messages">
+    <div class="top-part">
+        <a th:href="@{/friend/} + ${friendship.id}"><span class="glyphicon glyphicon-refresh refresh"></span></a>
+        <div th:class="'media ' + ${message.senderPubInfo.id == #authentication.principal.id ? 'my-msg' : 'other-msg'}" th:each="message : ${friendship.messages}">
+            <!-- 显示在左边的头像，也就是其他人的头像 -->
+            <div th:if="${message.senderPubInfo.id != #authentication.principal.id}" class="media-left media-middle">
+                <a th:href="@{/user/} + ${message.senderPubInfo.id}"><img class="icon img-circle" th:src="@{/img/} + ${message.senderPubInfo.iconUrl}"></a>
+                <button class="btn btn-danger btn-xs" disabled>Delete</button>
+            </div>
+
+            <div class="media-body">
+                <p>
+                    <a th:href="@{/user/} + ${message.senderPubInfo.id}">
+                        <span th:if="${message.senderPubInfo.id == #authentication.principal.id}" th:text="${message.senderPubInfo.username}"></span>
+                        <span th:if="${message.senderPubInfo.id != #authentication.principal.id}" th:text="${message.senderPubInfo.username} + '(' + ${friendship.remarks == null ? 'NoRemarks' : friendship.remarks} + ')'"></span>
+                    </a>
+                </p>
+                <p th:text="${#dates.format(message.sendTime, 'yyyy-MM-dd HH:mm:ss')}"></p>
+                <p class="msg-content" th:utext="${message.content}"></p>
+            </div>
+
+            <!-- 显示在右边的头像，也就是自己的头像 -->
+            <div th:if="${message.senderPubInfo.id == #authentication.principal.id}" class="media-right media-middle">
+                <a th:href="@{/user/} + ${message.senderPubInfo.id}"><img class="icon img-circle" th:src="@{/img/} + ${message.senderPubInfo.iconUrl}"></a>
+                <!-- 该消息是本人发送的，可以删除此消息 -->
+                <button class="btn btn-danger btn-xs" th:attr="mid=${message.id}" onclick="delMsgFunction(this)">Delete</button>
+            </div>
+        </div>
+    </div>
+    <div class="bottom-part">
+        <button id="send-msg-btn" class="btn btn-lg btn-primary" onclick="sendMsgFunction()" type="button">Send</button>
+        <input id="text" class="form-control-static" placeholder="Say something..." />
+    </div>
+</div>
+
+<!-- 发送消息用的表单，已改用AJAX发送消息 -->
+<!--<form id="sendMsgform" th:action="@{/message}" method="post">-->
+    <!--<input type="hidden" name="isPrivate" value="true" />-->
+    <!--<input type="hidden" name="senderId" th:value="${#authentication.principal.id}" />-->
+    <!--<input type="hidden" name="acceptorId" th:value="${friendship.guestPubInfo.id}" />-->
+    <!--<input type="hidden" id="content" name="content">-->
+<!--</form>-->
+
+<!-- 引入底部信息 -->
+<div th:replace="fragments::footer"></div>
+
+<!-- 引入片段中的JQuery和Bootstrap的JS插件 -->
+<script th:replace="fragments::jquery"></script>
+<script th:replace="fragments::bootstrapJS"></script>
+
+<!-- 引入常用的函数 -->
+<script th:replace="fragments::usefulFunctions"></script>
+
+<!-- 发送/删除消息相关 -->
+<script>
+    function sendMsgFunction(){
+        // $("#content").val($("#text").val());
+        // $("#sendMsgform").submit();
+        var text = $("#text");
+        var id = '[[${#authentication.principal.id}]]';
+        var acceptorId = '[[${friendship.guestPubInfo.id}]]';
+        var content = text.val(); text.val("");
+        var data = {isPrivate: true, senderId: id, acceptorId: acceptorId, content: content};
+        $.ajax({
+            method: "post",
+            url: "/message",
+            data: data,
+            success: function (result) {
+                if(isEmptyStr(result) || result === 'Failed')
+                    $("#top-msg").text("Failed to send message!");
+                else{
+                    var username = '[[${#authentication.principal.username}]]';
+                    var iconUrl = '[[${#authentication.principal.iconUrl}]]';
+                    var index = result.indexOf(';');
+                    var time = result.substr(index + 1);
+                    var messageId = result.substr(0, index);
+                    var line1 = '<div class="media my-msg">';
+                    var line2 = '<div class="media-body">';
+                    var line3 = '<p>';
+                    var line4 = '<a href="/user/' + id + '">';
+                    var line5 = '<span>' + username + '</span>'
+                    var line6 = '</a>';
+                    var line7 = '</p>';
+                    var line8 = '<p>' + time + '</p>';
+                    var line9 = '<p class="msg-content">' + content + '</p>';
+                    var linea = '</div>';
+                    var lineb = '<div class="media-right media-middle">';
+                    var linec = '<a href="/user/' + id + '"><img class="icon img-circle" src="/img/' + iconUrl + '"></a>';
+                    var lined = '<button class="btn btn-danger btn-xs" onclick="delMsgFunction(this)" mid="' + messageId + '">Delete</button>'
+                    var linee = '</div>' + '</div>';
+                    var div = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + linea + lineb + linec + lined + linee;
+                    $(".top-part").append(div);
+                    document.querySelector(".top-part .media:last-child").scrollIntoView();
+                    $("#top-msg").text("Sent message successfully!");
+                }
+            }
+        });
+    }
+    function delMsgFunction(obj){
+        var mid = $(obj).attr("mid");
+        var data = {mid: mid};
+        $.ajax({
+            method: "delete",
+            url: "/message",
+            data: data,
+            success:function(result){
+                if(!isEmptyStr(result) && result === 'OK'){
+                    $("#top-msg").text("Deleted successfully!");
+                    $(obj).parents(".media").remove();
+                }
+                else
+                    $("#top-msg").text("Error occurred!");
+            }
+        });
+    }
+</script>
+
+<script>
+    $(function () {
+        document.querySelector(".media:last-child").scrollIntoView();
+    })
+</script>
+
+</body>
+</html>

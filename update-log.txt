@@ -1,0 +1,149 @@
+** Web层开发过程：先实现功能并保证在页面中能看出执行结果；页面的CSS美化和权限控制等留到最后再完成；
+
+01 更新项目的preface文件，明确项目的功能，并确定需要创建的数据库的表；
+
+02 根据上述分析创建相应的实体类，配置连接池，编写SQL建表语句；
+
+03 开发Mapper并完成初步测试；
+
+  - 可以先测试各个Mapper的增删改方法，待各个数据库表都已经有记录后再测试各个Mapper的查询方法；
+
+04 开发Service完成，并编写SystemUserConfig配置类（创建一个"DIT小助手"用户）；
+
+05 初步完成网页导航条的编写，额外编写MailService接口及其实现类来完成发送邮件业务；
+
+06 编写com/laidw/controller/url-mapping.txt文件，明确地址映射规则；
+
+07 完成注册功能，主要步骤如下：
+
+  - 完成BaseController的toRegisterPage()和doRegister()方法；
+
+  - 编写user/info.html页面和mail/verify.html页面；
+
+  - 在user/info.html页面使用AJAX判断信息是否被注册，BaseController增加doCheck()方法；
+
+08 完成激活账户功能：BaseController新增doVerify()方法；
+
+09 完成登录认证功能，主要步骤如下：
+
+  - User类实现UserDetails接口，编写UserDetailsService接口的实现类；
+
+  - 编写SecurityConfig类，指定使用自定义的登录页面和UserDetailsService实现类；
+
+  - 编写base/login.html和base/index.html页面，BaseController添加相应的方法；
+
+10 完成找回密码功能：
+
+  - BaseController新增toForgetPage()和doForget()方法；
+
+  - 新增email/find-back.html和base/forget.html页面
+
+11 完成修改用户信息功能：
+
+  - 配置HiddenHttpMethodFilter使项目支持PUT等方式的请求；
+
+  - 添加base/logout-soon.html页面用于自动登出，base/login.html页面新增自动登录功能；
+
+  - 完成UserController的toModifyMyInfoPage()和doModifyMyInfo()方法；
+
+12 完成头像修改功能：
+
+  - UserController新增toUserIconUploadPage()和doUserIconUpload()方法；
+
+  - 新增base/icon.html页面，同时新增WebMvcConfig类来配置静态资源路径；
+
+13 更新：t_message表的sender_id字段，在is_private == false时：
+
+  - 存储的值由membership.userPubInfo.id改为membership.id，同时取消该字段的外键约束；
+
+  - 相关改动详见MessageMapper.xml的21-22、47-50行，schema.sql的48-49行（行数可能有变）；
+
+14 完成创建群聊功能：
+
+  - 创建group/info.html页面；
+
+  - 完成GroupController的toCreateGroupPage()和doCreateGroup()方法；
+
+15 完成查询加入的群聊功能：
+
+  - 创建group/list.html页面；
+
+  - 完成MembershipController的toGroupListPage()方法；
+
+16 完成加入群聊的功能：
+
+  - 完成GroupController的doJoinGroup()方法；
+
+  - Membership实现Comparable接口方便排序；
+
+17 完成退出群聊的功能：完成GroupController的doLeaveGroup()方法;
+
+18 完成设置群聊的isShow、isTop属性的功能，即MembershipController的doChangeView()方法；
+
+19 完成进入群聊聊天界面的功能：
+
+  - 新建group/talk.html页面；
+
+  - GroupController新增toGroupTalkPage()方法；
+
+20 更新：t_task表的acc_id字段：
+
+  - 存储的值由acceptorPubInfo.userPubInfo.id改为acceptorPubInfo.id，同时更改外键；
+
+  - 相关改动参考schema.sql的36行，TaskMapper.xml的21-22，38，63-64，93行（行数可能有变）；
+
+21 修BUG：由于Message类和Task类都是和Membership类绑定的，而用户退出某个群是直接删掉对应的membership记录：
+
+  - 这会导致用户退出群后获取群的消息和任务时会出错！
+
+  - 可以考虑在用户退出群后顺便删掉其发送的消息，将其接收的任务的接收者设为空；
+
+  - 也可以给Membership类及其表增加一个字段用来判断该用户是否已经退群；
+
+  - 我采取的方法是：该群在建立后系统用户将自动加入该群（备注信息为"已退群用户"），有用户退群时系统用户自动顶替该用户的位置；
+
+22 完成解散群组功能：GroupController的doDeleteGroup()方法；
+
+23 完成修改群信息功能：GroupController的doUpdateGroup()方法；
+
+24 完成修改群员权限信息功能：MembershipController的doUpdateMembershipInfo()方法；
+
+25 完成发布任务功能：
+
+  - 新建task/info.html页面；
+
+  - TaskController新增toCreateTaskPage()和doCreateTask()方法；
+
+26 完成修改任务信息功能：TaskController新增toUpdateTaskPage()和doUpdateTask()方法；
+
+27 完成接收/放弃/完成任务功能：TaskController新增doOptTask()方法；
+
+28 完成切分任务功能：修改task/info.html页面，TaskController新增doSplitTask()方法；
+
+29 任务的层级显示初步完成，至此任务模块功能基本完成；
+
+30 完成搜索功能，BaseController新增doSearch()方法，新增base/search.html页面；
+
+31 完成查询我的好友功能，FriendController新增toMyFriendsPage()方法，新增user/list.html页面；
+
+32 完成查询某个用户信息的功能，UserController新增toUserInfoPage()方法；
+
+33 完成请求加好友的功能，FriendController新增doRequestToBeFriends()方法；
+
+34 完成进入我与某个好友的聊天界面功能，新增user/talk.html页面，FriendController新增toFriendTalkPage()方法；
+
+35 完成同意添加好友功能，FriendController新增agreeToBeFriends()方法；
+
+36 完成发送消息/删除消息功能，MessageController新增doSendMessage()和doDeleteMessage()方法；
+
+37 完成查询我接受的任务功能：
+
+  - 为了方便查询，t_task表新增acc_user_id字段（Task类保持不变即可），schema.sql和Mapper都需要相应地修改；
+
+  - 新增task/list.html页面，TaskController新增toMyAcceptedTasksPage()方法；
+
+38 Friendship实现Comparable接口，同时完成Friendship的isShow等属性的修改方法；
+
+  - FriendController新增doChangeView()方法和doChangeRemarks()方法；
+
+** 至此，项目的主要功能都已经大致完成~接下来就是美化页面和整理代码了~

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title id="title" th:text="${group.name}"></title>
+
+    <!-- 引入fragments.css文件 -->
+    <link th:replace="fragments::fragmentsCSS" />
+
+    <!-- 引入本页面对应的css文件 -->
+    <link th:href="@{/css/group/talk.css}" rel="stylesheet">
+
+    <!-- 引入片段中的Bootstrap -->
+    <link th:replace="fragments::bootstrap" />
+
+</head>
+<body data-spy="scroll" data-target=".navbar" data-offset="50">
+
+<!-- 引入导航条 -->
+<div th:replace="fragments::nevigate"></div>
+
+<!-- 在此添加页面主体信息 -->
+<!-- 这里我们采用标签页的方式来展示页面 -->
+<!-- 导航区 -->
+<ul id="myTabs" class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#home" role="tab" data-toggle="tab">Home Tab</a></li>
+    <li role="presentation"><a id="tasksTab" href="#tasks" role="tab" data-toggle="tab">Tasks Tab</a></li>
+</ul>
+<!-- 面板区 -->
+<div class="tab-content">
+    <!-- 显示群信息，群成员信息和群内的消息 -->
+    <div role="tabpanel" class="tab-pane active" id="home">
+        <div class="left-part">
+            <!-- 有管理员及以上权限的用户可以修改信息，群主可以解散群聊，非群主可以退出群聊 -->
+            <div class="media panel panel-default left-top-part">
+                <div class="media-left media-middle">
+                    <a th:href="@{/group/} + ${isAdmin ? 'icon/' : ''} + ${group.id}"><img class="icon img-circle" th:src="@{/img/} + ${group.iconUrl}" /></a>
+                </div>
+                <div class="media-body">
+                    <div>
+                        <input id="blur-name" class="form-control" type="text" th:value="${group.name}" onblur="blurFunction()" th:disabled="${!isAdmin}" />
+                        <a class="glyphicon glyphicon-refresh" th:href="@{/group/} + ${group.id}"></a>
+                    </div>
+                    <div>
+                        <input id="blur-slogan" class="form-control" type="text" th:value="${group.slogan}" onblur="blurFunction()" th:disabled="${!isAdmin}" />
+                        <span class="glyphicon glyphicon-remove" th:if="${isFounder}" onclick="delGroupFunction()"></span>
+                        <span class="glyphicon glyphicon-remove" th:if="${!isFounder}" onclick="leaveGroupFunction()"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 显示成员信息 -->
+            <div class="left-bottom-part memberships">
+                <div th:class="'media panel panel-default ' + ${membership.userPubInfo.gender ? 'man-member' : 'woman-member'}" th:each="membership : ${group.memberships}">
+                    <div class="media-left media-middle">
+                        <img class="icon img-circle" th:src="@{/img/} + ${membership.userPubInfo.iconUrl}" />
+                    </div>
+                    <div class="media-body">
+                        <p>
+                            <a th:href="@{/user/} + ${membership.userPubInfo.id}"><span th:text="${membership.userPubInfo.username} + '(' + ${membership.nickname == null ? 'NoNickname' : membership.nickname} + ')'"></span></a>
+                            <span th:class="'btn glyphicon glyphicon-volume-' + ${membership.isMute ? 'off' : 'up'}" th:if="${(isAdmin && membership.role.name().equals('NORMAL')) || (isFounder && !membership.role.name().equals('FOUNDER'))}" onclick="updateRightFunction(this)" th:attr="isMute=${!membership.isMute},mid=${membership.id}"></span>
+                            <span disabled="disabled" th:class="'btn glyphicon glyphicon-volume-' + ${membership.isMute ? 'off' : 'up'}" th:if="${!((isAdmin && membership.role.name().equals('NORMAL')) || (isFounder && !membership.role.name().equals('FOUNDER')))}"></span>
+                        </p>
+                        <p>
+                            <button th:text="'Role: ' + ${membership.role}" class="btn btn-default btn-xs" th:if="${isFounder && !membership.role.name().equals('FOUNDER')}" onclick="updateRightFunction(this)" th:attr="role=${membership.role.name().equals('ADMIN') ? 'NORMAL' : 'ADMIN'},mid=${membership.id}"></button>
+                            <span disabled="disabled" th:text="'Role: ' + ${membership.role}" class="btn btn-default btn-xs" th:if="${!isFounder || membership.role.name().equals('FOUNDER')}"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-part">
+            <div class="right-top-part">
+                <div th:class="'media ' + ${message.senderPubInfo.id == myMembership.id ? 'my-msg' : 'other-msg'}" th:each="message : ${group.messages}">
+                    <!-- 显示在左边的头像，也就是其他人的头像 -->
+                    <div th:if="${message.senderPubInfo.id != myMembership.id}" class="media-left media-middle">
+                        <a th:href="@{/user/} + ${message.senderPubInfo.userPubInfo.id}"><img class="icon img-circle" th:src="@{/img/} + ${message.senderPubInfo.userPubInfo.iconUrl}"></a>
+                        <!-- 如果本人是管理员、发送者是普通成员，或本人是群主、发送者是非群主，则可以删除此消息 -->
+                        <button class="btn btn-danger btn-xs" th:disabled="${!(isFounder || (isAdmin && message.senderPubInfo.role.name().equals('NORMAL')))}" th:attr="mid=${message.id}" onclick="delMsgFunction(this)">Delete</button>
+                    </div>
+
+                    <div class="media-body">
+                        <p>
+                            <a th:href="@{/user/} + ${message.senderPubInfo.userPubInfo.id}">
+                                <span th:text="${message.senderPubInfo.userPubInfo.username} + '(' + ${message.senderPubInfo.nickname == null ? 'NoNickname' : message.senderPubInfo.nickname} + ')'"></span>
+                            </a>
+                            <span th:text="${message.senderPubInfo.role.name()}"></span>
+                        </p>
+                        <p th:text="${#dates.format(message.sendTime, 'yyyy-MM-dd HH:mm:ss')}"></p>
+                        <p class="msg-content" th:utext="${message.content}"></p>
+                    </div>
+
+                    <!-- 显示在右边的头像，也就是自己的头像 -->
+                    <div th:if="${message.senderPubInfo.id == myMembership.id}" class="media-right media-middle">
+                        <a th:href="@{/user/} + ${message.senderPubInfo.userPubInfo.id}"><img class="icon img-circle" th:src="@{/img/} + ${message.senderPubInfo.userPubInfo.iconUrl}"></a>
+                        <!-- 该消息是本人发送的，可以删除此消息 -->
+                        <button class="btn btn-danger btn-xs" th:attr="mid=${message.id}" onclick="delMsgFunction(this)">Delete</button>
+                    </div>
+                </div>
+            </div>
+            <div class="right-bottom-part">
+                <button id="send-msg-btn" class="btn btn-lg btn-primary" onclick="sendMsgFunction()" type="button">Send</button>
+                <input id="text" class="form-control-static" placeholder="Say something..." />
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 显示任务信息 -->
+    <div role="tabpanel" class="tab-pane" id="tasks">
+        <div class="tasks">
+            <h3>
+                <a th:if="${isAdmin}" th:href="@{/task?gid=} + ${group.id}">Create a task</a>
+                <span th:if="${!isAdmin}">Task list</span>
+                <a th:href="@{/group/} + ${group.id} + '?goToTasks=true'"><span style="float: left;" class="glyphicon glyphicon-refresh"></span></a>
+            </h3>
+
+            <table class="table">
+                <tr>
+                    <th style="text-align: left;">Title</th>
+                    <th>Content</th>
+                    <th>PubTime</th>
+                    <th>FinTime</th>
+                    <th>Status</th>
+                    <th>Acceptor</th>
+                    <th>Result</th>
+                    <th>Operation</th>
+                </tr>
+            </table>
+
+            <div th:replace="fragments::showTaskList(${group.tasks}, 1)"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 引入底部信息 -->
+<div th:replace="fragments::footer"></div>
+
+<!-- 隐藏的表单 -->
+<div class="forms">
+    <!-- 用于删除本群的表单 -->
+    <form id="delGroupForm" th:if="${isFounder}" th:action="@{/group}" method="post">
+        <input type="hidden" name="_method" value="delete" />
+        <input type="hidden" name="id" th:value="${group.id}" />
+    </form>
+
+    <!-- 用于离开本群的表单 -->
+    <form id="leaveGroupForm" th:if="${!isFounder}" th:action="@{/group/leave/} + ${group.id}" method="post">
+        <input type="hidden" name="_method" value="delete" />
+    </form>
+
+    <!-- 用于修改成员权限的表单 -->
+    <form id="updateRightForm" th:if="${isAdmin}" th:action="@{/membership/right}" method="post">
+        <input type="hidden" name="_method" value="put" />
+        <input type="hidden" name="gid" th:value="${group.id}"/>
+        <input id="updateId" type="hidden" name="id" />
+        <input id="updateIsMute" type="hidden" name="isMute" />
+        <input id="updateRole" th:if="${isFounder}" type="hidden" name="role" />
+    </form>
+
+    <!-- 发送消息用的表单，已改用AJAX发送消息 -->
+    <!--<form id="sendMsgform" th:action="@{/message}" method="post">-->
+        <!--<input type="hidden" name="isPrivate" value="false" />-->
+        <!--<input type="hidden" name="senderId" th:value="${myMembership.id}" />-->
+        <!--<input type="hidden" name="acceptorId" th:value="${group.id}" />-->
+        <!--<input type="hidden" id="content" name="content">-->
+    <!--</form>-->
+
+    <!-- 接收，完成，放弃任务用的表单 -->
+    <form id="taskOtpForm" th:action="@{/task/}" method="post">
+        <input type="hidden" name="_method" value="put" />
+        <input type="hidden" name="mid" th:value="${myMembership.id}" />
+        <input type="hidden" name="uid" th:value="${myMembership.userPubInfo.id}" />
+        <input type="hidden" name="gid" th:value="${myMembership.groupPubInfo.id}"/>
+        <input id="tid" type="hidden" name="tid" />
+        <input id="result" type="hidden" />
+    </form>
+</div>
+
+<!-- 引入片段中的JQuery和Bootstrap的JS插件 -->
+<script th:replace="fragments::jquery"></script>
+<script th:replace="fragments::bootstrapJS"></script>
+
+<!-- 引入常用的函数 -->
+<script th:replace="fragments::usefulFunctions"></script>
+
+<!-- 切换标签页 -->
+<script>
+    $('#myTabs a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show')
+    })
+</script>
+
+<!-- 修改群组信息或删除/离开群组相关 -->
+<script>
+    function blurFunction() {
+        var gid = "[[${group.id}]]";
+        var name = $("#blur-name").val();
+        var slogan = $("#blur-slogan").val();
+        $.ajax({
+            method: "put",
+            url: "/group",
+            data: {id: gid, name: name, slogan: slogan},
+            success:function(result){
+                var topMsg = $("#top-msg");
+                if(!isEmptyStr(result) && result === "OK"){
+                    topMsg.text("Changed successfully!");
+                    $("#title").text(name);
+                }
+                else
+                    topMsg.text("Error occurred!");
+            }
+        });
+    }
+    function delGroupFunction(){
+        var input = prompt("You are going to delete this group! Please input the name of this group:");
+        if(input === null || input !== $("#title").text()){
+            alert("Quit to delete this group!");
+            return;
+        }
+        $("#delGroupForm").submit();
+    }
+    function leaveGroupFunction() {
+        var input = prompt("You are going to leave this group! Please input the name of this group:");
+        if(input === null || input !== $("#title").text()){
+            alert("Quit to leave this group!");
+            return;
+        }
+        $("#leaveGroupForm").submit();
+    }
+</script>
+
+<!-- 修改群员权限相关 -->
+<script>
+    function updateRightFunction(obj){
+        var btn = $(obj);
+        var mid = btn.attr("mid");
+        var role = btn.attr("role");
+        var isMute = btn.attr("isMute");
+        $("#updateId").val(mid);
+        $("#updateRole").val(role);
+        $("#updateIsMute").val(isMute);
+        $("#updateRightForm").submit();
+    }
+</script>
+
+<!-- 页面加载完毕后消息栏自动滚到底部，同时判断是否前往任务标签页，以及任务details的开闭 -->
+<script>
+    var goToTasks = "[[${goToTasks}]]";
+    $(function () {
+        //scrollIntoView(boolean)：true表示在能完整看到该元素的情况下拖到最下，false则表示拖到能完整看到该元素后就停止下滑
+        document.querySelector(".right-top-part .media:last-child").scrollIntoView();
+
+        if(!isEmptyStr(goToTasks) && goToTasks === "true")
+            $("#tasksTab").tab('show');
+
+        $("details").each(function (index, value) {
+            if($(value).attr("my-open") === 'true')
+                $(value).attr("open", "open");
+        });
+    })
+</script>
+
+<!-- 发送/删除消息相关 -->
+<script>
+    function sendMsgFunction(){
+        var text = $("#text");
+        var membershipId = '[[${myMembership.id}]]';
+        var acceptorId = '[[${group.id}]]';
+        var content = text.val(); text.val("");
+        var data = {isPrivate: false, senderId: membershipId, acceptorId: acceptorId, content: content};
+        $.ajax({
+            method: "post",
+            url: "/message",
+            data: data,
+            success: function (result) {
+                if(isEmptyStr(result) || result === 'Failed')
+                    $("#top-msg").text("Failed to send message!");
+                else{
+                    var id = '[[${#authentication.principal.id}]]';
+                    var username = '[[${#authentication.principal.username}]]';
+                    var iconUrl = '[[${#authentication.principal.iconUrl}]]';
+                    var nickname = '[[${myMembership.nickname}]]';
+                    var role = '[[${myMembership.role}]]';
+                    var index = result.indexOf(';');
+                    var time = result.substr(index + 1);
+                    var messageId = result.substr(0, index);
+                    var line1 = '<div class="media my-msg">';
+                    var line2 = '<div class="media-body">';
+                    var line3 = '<p>';
+                    var line4 = '<a href="/user/' + id + '">';
+                    var line5 = '<span>' + username + '(' + (isEmptyStr(nickname) ? 'NoNickname' : nickname) + ')' + '</span>';
+                    var line6 = '</a> ';
+                    var line7 = '<span>' + role + '</span>';
+                    var line8 = '</p>';
+                    var line9 = '<p>' + time + '</p>';
+                    var linea = '<p class="msg-content">' + content + '</p>';
+                    var lineb = '</div>';
+                    var linec = '<div class="media-right media-middle">';
+                    var lined = '<a href="/user/' + id + '"><img class="icon img-circle" src="/img/' + iconUrl + '"></a>';
+                    var linee = '<button class="btn btn-danger btn-xs" onclick="delMsgFunction(this)" mid="' + messageId + '">Delete</button>';
+                    var linef = '</div>' + '</div>';
+                    var div = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + linea + lineb + linec + lined + linee + linef;
+                    $(".right-top-part").append(div);
+                    document.querySelector(".right-top-part .media:last-child").scrollIntoView();
+                    $("#top-msg").text("Sent message successfully!");
+                }
+            }
+        });
+    }
+    function delMsgFunction(obj){
+        var mid = $(obj).attr("mid");
+        var data = {mid: mid};
+        $.ajax({
+            method: "delete",
+            url: "/message",
+            data: data,
+            success:function(result){
+                if(!isEmptyStr(result) && result === 'OK'){
+                    $("#top-msg").text("Deleted successfully!");
+                    $(obj).parents(".media").remove();
+                }
+                else
+                    $("#top-msg").text("Error occurred!");
+            }
+        });
+    }
+</script>
+
+<!-- 接收/完成/放弃/删除任务相关 -->
+<script>
+    var taskOptForm = $("#taskOtpForm");
+    var tid = $("#tid");
+    var result = $("#result");
+    function optFunction(obj) {
+        taskOptForm.attr("action", taskOptForm.attr("action") + $(obj).attr("opt"));
+        tid.attr("value", $(obj).attr("tid"));
+        if($(obj).attr("opt") === 'fin'){
+            result.attr("name", "result");
+            var value = prompt("Please enter your task result: ");
+            if(value == null)
+                return;
+            result.attr("value", value);
+        }
+        taskOptForm.submit();
+    }
+    function delTaskFunction(obj) {
+        var tid = $(obj).attr("tid");
+        var topMsg = $("#top-msg");
+        var data = {tid: tid};
+        $.ajax({
+            method: "delete",
+            url: "/task",
+            data: data,
+            success: function (result) {
+                if(isEmptyStr(result))
+                    topMsg.text("Error occurred!");
+                else if(result === "OK"){
+                    topMsg.text("Removed task successfully! But it will be better if you refresh this page!");
+                    $(obj).parents("details").first().remove();
+                }
+                else
+                    topMsg.text(result);
+            }
+        })
+    }
+</script>
+
+</body>
+</html>

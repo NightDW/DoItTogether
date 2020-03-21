@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.laidw.mapper.MessageMapper">
+
+    <!-- =============================抽取SQL片段============================= -->
+
+    <!-- 表名 -->
+    <sql id="tableName">
+        t_message
+    </sql>
+
+    <!-- 插入表时涉及的列 -->
+    <sql id="insertTableCols">
+        (is_private, acc_id, sender_id, send_time, content)
+    </sql>
+
+    <!-- 插入表时涉及的类的属性 -->
+    <sql id="insertClassAtts">
+        <!--(#{isPrivate}, #{accId}, <if test="isPrivate == true">#{senderPubInfo.id}</if><if test="isPrivate == false">#{senderPubInfo.userPubInfo.id}</if>, #{sendTime}, #{content})-->
+        (#{isPrivate}, #{accId}, #{senderPubInfo.id}, #{sendTime}, #{content})
+    </sql>
+
+    <!-- WHERE id = #{id} -->
+    <sql id="whereId">
+        WHERE id = #{id}
+    </sql>
+
+    <!-- =============================抽取SQL片段============================= -->
+
+
+    <!-- =============================定义封装规则============================= -->
+
+    <resultMap id="messageMap" type="com.laidw.entity.Message">
+        <id column="id" property="id" />
+        <result column="is_private" property="isPrivate" />
+        <result column="acc_id" property="accId" />
+        <result column="send_time" property="sendTime" />
+        <result column="content" property="content" />
+        <discriminator javaType="boolean" column="is_private">
+            <case value="true">
+                <association property="senderPubInfo" column="sender_id" javaType="com.laidw.entity.User"
+                             select="com.laidw.mapper.UserMapper.selectUserPubInfoById" />
+            </case>
+            <case value="false">
+                <!--<association property="senderPubInfo" column="{uid=sender_id,gid=acc_id}" javaType="com.laidw.entity.Membership"-->
+                             <!--select="com.laidw.mapper.MembershipMapper.selectMembershipPubInfo" />-->
+                <association property="senderPubInfo" column="sender_id" javaType="com.laidw.entity.Membership"
+                             select="com.laidw.mapper.MembershipMapper.selectMembershipPubInfoById" />
+            </case>
+        </discriminator>
+    </resultMap>
+
+    <!-- =============================定义封装规则============================= -->
+
+
+    <!-- =============================编写SQL语句============================= -->
+    <insert id="insertMessage" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        <include refid="tableName" />
+        <include refid="insertTableCols" />
+        VALUES
+        <include refid="insertClassAtts" />
+    </insert>
+    <delete id="deleteMessageById">
+        DELETE FROM
+        <include refid="tableName" />
+        <include refid="whereId" />
+    </delete>
+    <delete id="deleteMessagesBetween">
+        DELETE FROM
+        <include refid="tableName" />
+        WHERE is_private = TRUE AND ((sender_id = #{param1} AND acc_id = #{param2}) OR (sender_id = #{param2} AND acc_id = #{param1}))
+    </delete>
+    <delete id="deleteMessagesByGroupId">
+        DELETE FROM
+        <include refid="tableName" />
+        WHERE is_private = false AND acc_id = #{gid}
+    </delete>
+    <update id="updateGroupMessageSenderId">
+        UPDATE
+        <include refid="tableName" />
+        SET sender_id = #{nid}
+        WHERE sender_id = #{oid} AND acc_id = #{gid} AND is_private = 0
+    </update>
+    <select id="selectMessagesByGroupId" resultMap="messageMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE is_private = FALSE AND acc_id = #{gid}
+    </select>
+    <select id="selectMessagesBetween" resultMap="messageMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE is_private = TRUE AND ((sender_id = #{param1} AND acc_id = #{param2}) OR (sender_id = #{param2} AND acc_id = #{param1}))
+    </select>
+    <!-- =============================编写SQL语句============================= -->
+
+</mapper>

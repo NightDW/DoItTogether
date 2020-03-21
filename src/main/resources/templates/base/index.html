@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title>DoItTogether</title>
+
+    <!-- 引入fragments.css文件 -->
+    <link th:replace="fragments::fragmentsCSS" />
+
+    <!-- 引入本页面对应的css文件 -->
+    <link th:href="@{/css/base/index.css}" rel="stylesheet">
+
+    <!-- 引入片段中的Bootstrap -->
+    <link th:replace="fragments::bootstrap" />
+
+</head>
+<body>
+
+<!-- 引入导航条 -->
+<div th:replace="fragments::nevigate"></div>
+
+<!-- 在此添加页面主体信息 -->
+<div class="jumbotron">
+    <h1>DoItTogether</h1>
+    <p>Welcome to DoItTogether(DIT) Platform!</p>
+    <p>
+        This is an online-platform where you can complete your tasks with your partners,
+        talk with them, or have a private communication with your friends!
+    </p>
+    <p>Just have fun!</p>
+    <p sec:authorize="!isAuthenticated()">Oh! You are not signed in! You can:</p>
+    <p sec:authorize="!isAuthenticated()">
+        <a class="btn btn-primary btn-lg" th:href="@{/register}" role="button">Register</a>
+        <a class="btn btn-primary btn-lg" th:href="@{/login}" role="button">Login</a>
+    </p>
+    <p sec:authorize="isAuthenticated()">Now you are signed in, you can search for what you are interested in or:</p>
+    <p sec:authorize="isAuthenticated()">
+        <a id="create-group-btn" class="btn btn-primary btn-lg" th:href="@{/group}" role="button">Create a group</a>
+    </p>
+</div>
+
+<!-- 引入底部信息 -->
+<div th:replace="fragments::footer"></div>
+
+<!-- 引入片段中的JQuery和Bootstrap的JS插件 -->
+<script th:replace="fragments::jquery"></script>
+<script th:replace="fragments::bootstrapJS"></script>
+
+<!-- 引入常用的函数 -->
+<script th:replace="fragments::usefulFunctions"></script>
+
+</body>
+</html>

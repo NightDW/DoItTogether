@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.laidw.mapper.UserMapper">
+
+    <!-- =============================抽取SQL片段============================= -->
+
+    <!-- 表名 -->
+    <sql id="tableName">
+        t_user
+    </sql>
+
+    <!-- 插入表时涉及的列 -->
+    <sql id="insertTableCols">
+        (username, password, introduction, icon_url, email, phone, gender, role, is_valid, verify_code)
+    </sql>
+
+    <!-- 插入表时涉及的类的属性 -->
+    <sql id="insertClassAtts">
+        (#{username}, #{password}, #{introduction}, #{iconUrl}, #{email}, #{phone}, #{gender}, #{role}, #{isValid}, #{verifyCode})
+    </sql>
+
+    <!-- WHERE id = #{id} -->
+    <sql id="whereId">
+        WHERE id = #{id}
+    </sql>
+
+    <!-- 根据特定条件查询的WHERE语句 -->
+    <sql id="whereCondition">
+        <where>
+            <choose>
+                <when test="id != null">
+                    id = #{id}
+                </when>
+                <when test="id == null &amp;&amp; username != null">
+                    username = #{username}
+                </when>
+                <when test="id == null &amp;&amp; username == null &amp;&amp; email != null">
+                    email = #{email}
+                </when>
+                <when test="id == null &amp;&amp; username == null &amp;&amp; email == null &amp;&amp; phone != null">
+                    phone = #{phone}
+                </when>
+                <otherwise>
+                    id = 0
+                </otherwise>
+            </choose>
+        </where>
+    </sql>
+
+    <!-- 无条件更新的SET语句 -->
+    <sql id="updateSetting">
+        username = #{username},
+        password = #{password},
+        introduction = #{introduction},
+        icon_url = #{iconUrl},
+        email = #{email},
+        phone = #{phone},
+        gender = #{gender},
+        role = #{role},
+        is_valid = #{isValid},
+        verify_code = #{verifyCode},
+    </sql>
+
+    <!-- 只更新非空字段时的SET语句 -->
+    <sql id="updateSelectivelySetting">
+        <if test="username != null">
+            username = #{username},
+        </if>
+        <if test="password != null">
+            password = #{password},
+        </if>
+        <if test="introduction != null">
+            introduction = #{introduction},
+        </if>
+        <if test="iconUrl != null">
+            icon_url = #{iconUrl},
+        </if>
+        <if test="email != null">
+            email = #{email},
+        </if>
+        <if test="phone != null">
+            phone = #{phone},
+        </if>
+        <if test="gender != null">
+            gender = #{gender},
+        </if>
+        <if test="role != null">
+            role = #{role},
+        </if>
+        <if test="isValid != null">
+            is_valid = #{isValid},
+        </if>
+        <if test="verifyCode != null">
+            verify_code = #{verifyCode},
+        </if>
+    </sql>
+
+    <!-- =============================抽取SQL片段============================= -->
+
+
+    <!-- =============================定义封装规则============================= -->
+
+    <!-- 公开信息的封装规则 -->
+    <resultMap id="onlyPubInfoMap" type="com.laidw.entity.User">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="introduction" property="introduction" />
+        <result column="icon_url" property="iconUrl" />
+        <result column="email" property="email" />
+        <result column="phone" property="phone" />
+        <result column="gender" property="gender" />
+        <result column="role" property="role" />
+        <result column="is_valid" property="isValid" />
+        <result column="verify_code" property="verifyCode" />
+    </resultMap>
+
+    <!-- 全映射封装规则 -->
+    <resultMap id="fullMap" type="com.laidw.entity.User" extends="onlyPubInfoMap">
+        <collection property="friendships" column="id"
+                    select="com.laidw.mapper.FriendshipMapper.selectFriendshipsByHostId" />
+        <collection property="memberships" column="id"
+                    select="com.laidw.mapper.MembershipMapper.selectMembershipsByUserId" />
+        <collection property="acceptedTasks" column="id"
+                    select="com.laidw.mapper.TaskMapper.selectTasksByAccUserId" />
+    </resultMap>
+
+    <!-- =============================定义封装规则============================= -->
+
+
+    <!-- =============================编写SQL语句============================= -->
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        <include refid="tableName" />
+        <include refid="insertTableCols" />
+        VALUES
+        <include refid="insertClassAtts" />
+    </insert>
+    <delete id="deleteUserById">
+        DELETE FROM
+        <include refid="tableName" />
+        <include refid="whereId" />
+    </delete>
+    <update id="updateUserById">
+        UPDATE
+        <include refid="tableName" />
+        <set>
+            <include refid="updateSetting" />
+        </set>
+        <include refid="whereId" />
+    </update>
+    <update id="updateUserByIdSelectively">
+        UPDATE
+        <include refid="tableName" />
+        <set>
+            <include refid="updateSelectivelySetting" />
+        </set>
+        <include refid="whereId" />
+    </update>
+    <select id="selectUserById" resultMap="fullMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        <include refid="whereId" />
+    </select>
+    <select id="selectUserPubInfoById" resultMap="onlyPubInfoMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        <include refid="whereId" />
+    </select>
+    <select id="selectUserByCondition" resultMap="fullMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        <include refid="whereCondition" />
+    </select>
+    <select id="selectUserPubInfoByCondition" resultMap="onlyPubInfoMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        <include refid="whereCondition" />
+    </select>
+    <select id="selectAllUsers" resultMap="fullMap">
+        SELECT * FROM
+        <include refid="tableName" />
+    </select>
+    <select id="searchUsersLike" resultMap="onlyPubInfoMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE username LIKE #{key} OR introduction LIKE #{key}
+    </select>
+    <select id="searchUserByKey" resultMap="onlyPubInfoMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE username = #{key} OR introduction = #{key} OR email = #{key} OR phone = #{key}
+    </select>
+    <!-- =============================编写SQL语句============================= -->
+
+</mapper>

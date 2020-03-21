@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Friends</title>
+
+    <!-- 引入fragments.css文件 -->
+    <link th:replace="fragments::fragmentsCSS" />
+
+    <!-- 引入本页面对应的css文件 -->
+    <link th:href="@{/css/user/list.css}" rel="stylesheet">
+
+    <!-- 引入片段中的Bootstrap -->
+    <link th:replace="fragments::bootstrap" />
+
+</head>
+<body>
+
+<!-- 引入导航条 -->
+<div th:replace="fragments::nevigate"></div>
+
+<!-- 在此添加页面主体信息 -->
+<!--<div class="users">-->
+    <!--<div th:each="friendship : ${friendships}" class="user">-->
+        <!--<div class="media panel panel-default">-->
+            <!--<div class="media-left media-middle">-->
+                <!--<img class="icon" th:src="@{/img/} + ${friendship.guestPubInfo.iconUrl}" />-->
+            <!--</div>-->
+            <!--<div class="media-body">-->
+                <!--<h3>-->
+                    <!--<a th:href="@{/friend/} + ${friendship.id}" th:text="${friendship.guestPubInfo.username}"></a>-->
+                <!--</h3>-->
+                <!--<p>-->
+                    <!--<span>The remarks you set about him/her: </span>-->
+                    <!--<input th:value="${friendship.remarks}" placeholder="Set remarks" onblur="setRemarks(this)" th:attr="fid=${friendship.id}" />-->
+                <!--</p>-->
+                <!--<span class="glyphicons">-->
+                    <!--<a th:href="@{/friend/view/} + ${friendship.id} + ${friendship.isTop ? '/10' : '/11'} "><span th:class="'glyphicon glyphicon-star' + ${friendship.isTop ? '' : '-empty'}"></span></a>-->
+                    <!--<a th:href="@{/friend/view/} + ${friendship.id} + ${friendship.isShow ? '/00' : '/01'} "><span th:class="'glyphicon glyphicon-eye-' + ${friendship.isShow ? 'open' : 'close'}"></span></a>-->
+                <!--</span>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+
+<div class="main">
+    <ul id="myTabs" class="nav nav-pills nav-stacked" role="tablist">
+        <li th:each="friendship : ${friendships}" role="presentation">
+            <div class="media panel panel-default">
+                <div class="media-left media-middle">
+                    <a th:href="'#user' + ${friendship.guestPubInfo.id}" role="tab" data-toggle="tab">
+                        <img class="icon" th:src="@{/img/} + ${friendship.guestPubInfo.iconUrl}" />
+                    </a>
+                </div>
+                <div class="media-body">
+                    <h4>
+                        <a th:href="@{/friend/} + ${friendship.id}" th:text="${friendship.guestPubInfo.username}"></a>
+                        <span class="glyphicons">
+                            <a th:href="@{/friend/view/} + ${friendship.id} + ${friendship.isTop ? '/10' : '/11'} "><span th:class="'glyphicon glyphicon-star' + ${friendship.isTop ? '' : '-empty'}"></span></a>
+                            <a th:href="@{/friend/view/} + ${friendship.id} + ${friendship.isShow ? '/00' : '/01'} "><span th:class="'glyphicon glyphicon-eye-' + ${friendship.isShow ? 'open' : 'close'}"></span></a>
+                        </span>
+                    </h4>
+                    <input th:value="${friendship.remarks}" placeholder="Set remarks" onblur="setRemarks(this)" th:attr="fid=${friendship.id}" />
+                </div>
+            </div>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div th:each="friendship : ${friendships}" th:id="'user' + ${friendship.guestPubInfo.id}" role="tabpanel" class="tab-pane">
+            <iframe th:src="@{/friend/frame/} + ${friendship.id}"></iframe>
+        </div>
+    </div>
+</div>
+
+<!-- 引入底部信息 -->
+<div th:replace="fragments::footer"></div>
+
+<!-- 引入片段中的JQuery和Bootstrap的JS插件 -->
+<script th:replace="fragments::jquery"></script>
+<script th:replace="fragments::bootstrapJS"></script>
+
+<!-- 引入常用的函数 -->
+<script th:replace="fragments::usefulFunctions"></script>
+
+<script>
+    function setRemarks(obj) {
+        var fid = $(obj).attr("fid");
+        var remarksStr = $(obj).val();
+        $.ajax({
+            url: "/friend/remarks/" + fid,
+            data: {remarks: remarksStr},
+            success:function(result){
+                $("#top-msg").text(!isEmptyStr(result) && result === "OK" ? 'Changed remarks successfully!': 'Failed to change remarks!');
+            }
+        });
+    }
+</script>
+
+
+
+</body>
+</html>

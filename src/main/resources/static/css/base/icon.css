@@ -1,0 +1,23 @@
+.form-inline {
+    max-width: 30%;
+    padding: 15px;
+    margin: 0 auto;
+}
+.form-inline .form-signin-heading{
+    text-align: center;
+}
+.form-inline button{
+    margin: 10px auto;
+}
+.form-inline .form-control {
+    position: relative;
+    height: auto;
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+.form-inline .msg{
+    color: red;
+    text-align: center;
+}

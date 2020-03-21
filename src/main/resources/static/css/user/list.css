@@ -1,0 +1,73 @@
+/*.users{*/
+    /*width: 60%;*/
+    /*margin: 70px auto;*/
+/*}*/
+/*.users a:hover{*/
+    /*text-decoration: none;*/
+/*}*/
+/*.media{*/
+    /*margin-bottom: 20px;*/
+    /*padding: 10px 30px;*/
+    /*overflow: hidden;*/
+    /*position: relative;*/
+    /*background-color: #eee !important;*/
+/*}*/
+/*.media .icon{*/
+    /*width: 66px;*/
+    /*height: 66px;*/
+/*}*/
+/*.panel .glyphicons{*/
+    /*font-size: 40px;*/
+    /*float: right;*/
+    /*position: absolute;*/
+    /*bottom: 23px;*/
+    /*left: 80%;*/
+/*}*/
+.main{
+    margin: 26px 10% 0 10%;
+}
+#myTabs, .tab-content{
+    display: inline-block;
+    float: left;
+    overflow-y: auto;
+    height: 550px;
+    border: 1px solid #999999;
+    border-radius: 6px;
+}
+#myTabs{
+    width: 30%;
+}
+.tab-content{
+    width: 70%;
+}
+.main a:hover{
+    text-decoration: none;
+}
+
+.media{
+    margin-bottom: 20px;
+    padding: 10px 30px;
+    overflow: hidden;
+    position: relative;
+    background-color: #eee !important;
+}
+.media h4{
+    margin: 5px 0;
+}
+.media .icon{
+    width: 52px;
+    height: 52px;
+}
+.media .glyphicons{
+    font-size: 21px;
+    float: right;
+    position: absolute;
+    bottom: 40px;
+    left: 70%;
+}
+
+.tab-content iframe{
+    width: 100%;
+    height: 540px;
+    border: none;
+}

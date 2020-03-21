@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Accepted Tasks</title>
+
+    <!-- 引入fragments.css文件 -->
+    <link th:replace="fragments::fragmentsCSS" />
+
+    <!-- 引入本页面对应的css文件 -->
+    <link th:href="@{/css/task/list.css}" rel="stylesheet">
+
+    <!-- 引入片段中的Bootstrap -->
+    <link th:replace="fragments::bootstrap" />
+
+</head>
+<body>
+
+<!-- 引入导航条 -->
+<div th:replace="fragments::nevigate"></div>
+
+<!-- 在此添加页面主体信息 -->
+<div role="tabpanel" class="tab-pane" id="tasks">
+    <div class="tasks">
+        <table class="table">
+            <tr>
+                <th style="text-align: left;">Title</th>
+                <th>Content</th>
+                <th>PubTime</th>
+                <th>FinTime</th>
+                <th>Status</th>
+                <th>Acceptor</th>
+                <th>Result</th>
+                <th>Operation</th>
+            </tr>
+        </table>
+
+        <div th:replace="fragments::showTaskList1(${tasks}, 1)"></div>
+    </div>
+</div>
+
+<!-- 完成/放弃任务时使用的表单 -->
+<form id="taskOtpForm" th:action="@{/task/}" method="post">
+    <input type="hidden" name="_method" value="put" />
+    <input id="tid" type="hidden" name="tid" />
+    <input id="result" type="hidden" />
+</form>
+
+<!-- 引入底部信息 -->
+<div th:replace="fragments::footer"></div>
+
+<!-- 引入片段中的JQuery和Bootstrap的JS插件 -->
+<script th:replace="fragments::jquery"></script>
+<script th:replace="fragments::bootstrapJS"></script>
+
+<!-- 引入常用的函数 -->
+<script th:replace="fragments::usefulFunctions"></script>
+
+<script>
+    var taskOptForm = $("#taskOtpForm");
+    var tid = $("#tid");
+    var result = $("#result");
+    function optFunction(obj) {
+        taskOptForm.attr("action", taskOptForm.attr("action") + $(obj).attr("opt"));
+        tid.attr("value", $(obj).attr("tid"));
+        if($(obj).attr("opt") === 'fin'){
+            result.attr("name", "result");
+            var res = prompt("Please enter your task result: ");
+            if(res == null)
+                return;
+            result.attr("value", res);
+        }
+        taskOptForm.submit();
+    }
+</script>
+
+<script>
+    function deleteMsgFunction(obj) {
+        $("#mid").attr("value", $(obj).attr("mid"));
+        $("#del-msg-form").submit();
+    }
+</script>
+
+</body>
+</html>

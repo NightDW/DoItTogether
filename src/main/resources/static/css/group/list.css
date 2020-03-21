@@ -1,0 +1,25 @@
+.groups{
+    width: 60%;
+    margin: 70px auto;
+}
+.groups a:hover{
+    text-decoration: none;
+}
+.media{
+    margin-bottom: 20px;
+    padding: 10px 30px;
+    overflow: hidden;
+    position: relative;
+    background-color: #eee !important;
+}
+.media .icon{
+    width: 66px;
+    height: 66px;
+}
+.panel .glyphicons{
+    font-size: 40px;
+    float: right;
+    position: absolute;
+    bottom: 40px;
+    left: 77%;
+}

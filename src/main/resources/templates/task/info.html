@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${task == null || task.id == null ? 'Create Task' : (readOnly == null || readOnly == false ? 'Edit Task' : 'Task Details')}"></title>
+
+    <!-- 引入fragments.css文件 -->
+    <link th:replace="fragments::fragmentsCSS" />
+
+    <!-- 引入本页面对应的css文件 -->
+    <link th:href="@{/css/task/info.css}" rel="stylesheet">
+
+    <!-- 引入片段中的Bootstrap -->
+    <link th:replace="fragments::bootstrap" />
+
+</head>
+<body>
+
+<!-- 引入导航条 -->
+<div th:replace="fragments::nevigate"></div>
+
+<!-- 在此添加页面主体信息 -->
+<div class="container">
+
+    <form id="form" class="form-inline" th:action="@{/task}" method="post">
+        <h2 class="form-signin-heading" th:text="${readOnly == null || !readOnly ? 'Please enter task info' : 'Task information'}"></h2>
+
+        <!-- 如果不是创建，则需要修改提交方式为PUT -->
+        <input th:if="${task != null && task.id != null}" type="hidden" name="_method" value="put" />
+        <input th:if="${gid != null}" type="hidden" name="gid" th:value="${gid}" />
+        <input th:if="${task != null && task.id != null}" type="hidden" name="id" th:value="${task.id}" />
+
+        <div class="form-group">
+            <label for="title">Title: </label>
+            <input id="title" name="title" type="text" class="form-control" placeholder="Task title" th:value="${task == null} ? _ : ${task.title}" th:readonly="${readOnly != null && readOnly}">
+        </div>
+
+        <div class="form-group">
+            <label for="content">Content: </label>
+            <input id="content" name="content" type="text" class="form-control" placeholder="Task introduction" th:value="${task == null} ? _ : ${task.content}" th:readonly="${readOnly != null && readOnly}">
+        </div>
+
+        <!-- 只读模式下可以显示更多信息 -->
+        <div class="form-group" th:if="${readOnly != null && readOnly}">
+            <label for="pub-time">PubTime: </label>
+            <input id="pub-time" type="text" class="form-control" placeholder="Task pub-time" th:value="${task == null || task.pubTime == null} ? '-' : ${#dates.format(task.pubTime, 'yy-MM-dd HH:mm:ss')}" readonly>
+        </div>
+        <div class="form-group" th:if="${readOnly != null && readOnly}">
+            <label for="fin-time">FinTime: </label>
+            <input id="fin-time" type="text" class="form-control" placeholder="Task fin-time" th:value="${task == null || task.finTime == null} ? '-' : ${#dates.format(task.finTime, 'yy-MM-dd HH:mm:ss')}" readonly>
+        </div>
+        <div class="form-group" th:if="${readOnly != null && readOnly}">
+            <label for="result">Result: </label>
+            <input id="result" type="text" class="form-control" placeholder="Task result" th:value="${task == null} ? _ : ${task.result}" readonly>
+        </div>
+        <div class="form-group" th:if="${readOnly != null && readOnly}">
+            <label for="acceptor">Acceptor: </label>
+            <input id="acceptor" type="text" class="form-control" placeholder="Task acceptor" th:value="${task == null || task.acceptorPubInfo == null} ? _ : ${task.acceptorPubInfo.userPubInfo.username}" readonly>
+        </div>
+
+        <button th:if="${readOnly == null || !readOnly}" class="btn btn-lg btn-primary btn-block" type="submit" th:text="${task == null || task.id == null} ? 'Create' : 'Modify'"></button>
+    </form>
+
+    <hr>
+
+    <!-- 当用户是在创建任务时，子任务展示表单不显示 -->
+    <!-- 如果用户是在修改任务信息，但该任务已经是父任务，则只显示子任务信息，而不能编辑 -->
+    <!-- 如果是修改操作，且该任务已被本人接收，也不能修改，也就是说必须是修改未被接收的叶子任务才允许任务切分 -->
+    <!-- 只有当用户是在修改叶子任务时候才提供切分任务的功能 -->
+    <form class="form-inline sons" th:action="@{/task/split}" method="post" th:if="${task != null && task.id != null}">
+        <h2 class="form-signin-heading" th:text="${(readOnly != null && readOnly) || task.hasSon || task.acceptorPubInfo != null ? 'Son tasks' : 'Split this task'}"></h2>
+        <input type="hidden" name="_method" value="put">
+        <input type="hidden" name="fid" th:value="${task.id}">
+        <input type="hidden" name="gid" th:value="${task.groupId}">
+        <div class="son" th:each="son,sonStat : ${task.sons}">
+            <h4 class='form-signin-heading' th:text="'Son' + ${sonStat.index}"></h4>
+            <div class="form-group">
+                <label th:for="'title' + ${sonStat.index}">Title: </label>
+                <input th:id="'title' + ${sonStat.index}" th:name="'tasks[' + ${sonStat.index} + '].title'" type="text" class="form-control" placeholder="Task title" th:value="${son.title}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label th:for="'content' + ${sonStat.index}">Content: </label>
+                <input th:id="'content' + ${sonStat.index}" th:name="'tasks[' + ${sonStat.index} + '].content'" type="text" class="form-control" placeholder="Task content" th:value="${son.content}" readonly>
+            </div>
+        </div>
+
+        <button th:if="${!task.hasSon && (readOnly == null || !readOnly) && task.acceptorPubInfo == null}" id="add-son-btn" class="btn btn-sm btn-primary btn-block" type="button">Create son task</button>
+        <button th:if="${!task.hasSon && (readOnly == null || !readOnly) && task.acceptorPubInfo == null}" class="btn btn-lg btn-primary btn-block" type="submit">Split</button>
+    </form>
+
+</div>
+
+<!-- 引入底部信息 -->
+<div th:replace="fragments::footer"></div>
+
+<!-- 引入片段中的JQuery和Bootstrap的JS插件 -->
+<script th:replace="fragments::jquery"></script>
+<script th:replace="fragments::bootstrapJS"></script>
+
+<!-- 引入常用的函数 -->
+<script th:replace="fragments::usefulFunctions"></script>
+
+<script>
+    function createSonTaskInput(num) {
+        var itemName = "tasks[" + num + "]";
+        var heading = "<div class='son'><h4 class='form-signin-heading'>Son" + num + "<span class='btn glyphicon glyphicon-trash' onclick='deleteSonTaskInput(this)'></span></h4>";
+        var prefix = "<div class='form-group'>";
+        var line1 = "<label for='title" + num +"'>Title</label>";
+        var line2 = "<input id='title" + num + "' name='" + itemName + ".title' type='text' class='form-control' placeholder='Task title'>";
+        var line3 = "<label for='content" + num +"'>Content</label>";
+        var line4 = "<input id='content" + num + "' name='" + itemName + ".content' type='text' class='form-control' placeholder='Task content'>";
+        var suffix = "</div>";
+        var footer = "</div>";
+        var finalStr = heading + prefix + line1 + line2 + suffix + prefix + line3 + line4 + suffix + footer;
+        $("#add-son-btn").before(finalStr);
+        document.getElementById("add-son-btn").scrollIntoView(true);
+    }
+    function deleteSonTaskInput(deleteBtn) {
+        $(deleteBtn).parent().parent().remove();
+    }
+</script>
+
+<script>
+    var times = 0;
+    $("#add-son-btn").click(function () {
+        createSonTaskInput(times);
+        times++;
+    })
+    //注意删除按钮不能像添加按钮这样来注册点击事件，这样做点击后不会有效果
+</script>
+
+</body>
+</html>

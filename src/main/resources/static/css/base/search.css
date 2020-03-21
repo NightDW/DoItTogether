@@ -1,0 +1,36 @@
+h2{
+    text-align: center;
+}
+.users, .groups{
+    width: 25%;
+    float: left;
+}
+.users{
+    margin-left: 20%;
+    margin-right: 10%;
+}
+.panel{
+    margin-bottom: 20px;
+    padding: 5% 10%;
+    overflow: hidden;
+    background-color: greenyellow !important;
+}
+.man-user{
+    background-color: lightskyblue !important;
+}
+.woman-user{
+    background-color: pink !important;
+}
+.panel a, .panel .glyphicon-star{
+    float: right;
+    font-size: 33px;
+    color: yellow;
+    text-decoration: none;
+}
+.panel a:hover{
+    text-decoration: none;
+}
+.msg{
+    color: red;
+    text-align: center;
+}

@@ -1,0 +1,168 @@
+a:hover{
+    text-decoration: none !important;
+}
+#myTabs{
+    margin: 21px 8% 1px 8%;
+}
+.left-part, .right-part, .tasks{
+    display: inline-block;
+    float: left;
+}
+.media .icon{
+    width: 50px;
+    height: 50px;
+}
+/*----------------------------------------------*/
+.left-part{
+    margin: 0 8%;
+    width: 26%;
+}
+.left-part .panel{
+    margin-bottom: 20px;
+    padding: 5%;
+    overflow: hidden;
+    background-color: greenyellow !important;
+}
+.left-part .left-top-part .media-body div{
+    line-height: 100%;
+    display: inline-block;
+}
+.left-part .left-top-part .form-control{
+    display: inline-block;
+    width: 90%;
+}
+.left-part .left-top-part .glyphicon{
+    font-size: 16px;
+    position: relative;
+    left: 16px;
+    width: 16px;
+}
+.left-part .left-top-part .glyphicon-remove{
+    color: red;
+}
+.left-part .left-bottom-part{
+    background-color: #eee;
+    overflow-y: auto;
+    height: 385px;
+}
+.left-part .left-bottom-part .man-member{
+    background-color: lightskyblue !important;
+}
+.left-part .left-bottom-part .woman-member{
+    background-color: pink !important;
+}
+.left-part .left-bottom-part .glyphicon{
+    font-size: 20px;
+    float: right;
+    position: relative;
+    right: 7px;
+}
+/*----------------------------------------------*/
+.right-part{
+    width: 50%;
+    margin-right: 0;
+}
+.right-part .right-top-part{
+    background-color: #eee;
+    overflow-y: auto;
+    height: 452px;
+    padding: 2%;
+}
+.right-part .right-top-part .media{
+    max-width: 66%;
+}
+.right-part .right-top-part .media .media-body{
+    padding: 8px 20px;
+    border-radius: 20px;
+    background-color: white;
+}
+.right-part .right-top-part .other-msg{
+    float: left;
+}
+.right-part .right-top-part .my-msg{
+    float: right;
+}
+.right-part .right-top-part .my-msg .media-body{
+    text-align: right;
+    background-color: greenyellow;
+}
+.right-part .right-top-part .msg-content{
+    margin-bottom: 0;
+}
+.right-part .right-bottom-part{
+    height: 40px;
+    margin-top: 20px;
+}
+.right-part .right-bottom-part input{
+    float: right;
+    height: 100%;
+    width: 90%;
+    max-width: 598px;
+    font-size: 16px;
+    padding-left: 5px;
+}
+.right-part .right-bottom-part button{
+    float: right;
+    height: 100%;
+}
+/*----------------------------------------------*/
+.tasks{
+    width: 84%;
+    margin-left: 8%;
+}
+.tasks h3{
+    text-align: center;
+    margin-bottom: 10px;
+}
+.tasks table{
+    margin-bottom: 10px;
+}
+.tasks .level1{
+    margin-bottom: 20px;
+    border-radius: 4px;
+    border: 1px solid #999;
+}
+.tasks details{
+    position: relative;
+    border-top: 1px solid #999;
+    overflow: hidden;
+}
+.tasks details summary{
+    height: 40px;
+    line-height: 40px;
+}
+.tasks details summary::-webkit-details-marker {
+    display: none;
+}
+.tasks details summary span, .tasks table th{
+    vertical-align: top;
+    height: 33px;
+    line-height: 33px;
+    font-size: 14px;
+    display: inline-block;
+    width: 12.5%;
+    float: left;
+    overflow: hidden;
+    text-align: center;
+    color: black;
+    box-sizing: border-box;
+}
+.tasks details summary span:nth-of-type(1), .tasks table th:nth-of-type(1){
+    clear: left;
+}
+.tasks details summary span:nth-of-type(2), .tasks table th:nth-of-type(2){
+    width: 18%;
+}
+.tasks details summary span:nth-of-type(5), .tasks table th:nth-of-type(5){
+    width: 7%;
+}
+.tasks details .progress-bar{
+    background-color: rgba(0, 255, 0, 0.2);
+    float: left;
+    position: absolute;
+    height: 40px;
+    z-index: -233;
+}
+.tasks details .son-bar{
+    background-color: rgba(255, 0, 0, 0.2);
+}

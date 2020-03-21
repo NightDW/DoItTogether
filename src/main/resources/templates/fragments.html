@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<!-- 引入th标签和sec标签 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Fragments</title>
+
+    <!-- 引用fragments.css文件 -->
+    <link th:fragment="fragmentsCSS" th:href="@{/css/fragments.css}" rel="stylesheet">
+
+    <!-- 引入Bootstrap -->
+    <link th:fragment="bootstrap" th:href="@{/webjars/bootstrap/3.4.1/css/bootstrap.min.css}" rel="stylesheet">
+
+</head>
+<body>
+
+<!-- 抽取所有页面的顶部导航条 -->
+<div th:fragment="nevigate">
+    <nav class="navbar navbar-default navbar-fixed-top nevigate">
+
+        <div id="navigate-container" class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" th:href="@{/}">DoItTogether</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="https://github.com/NightDW" target="_blank">My GitHub</a></li>
+                </ul>
+
+                <form class="navbar-form navbar-left" th:action="@{/search}" method="post">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search" name="key" th:value="${key}">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="checkbox" name="rough" value="true" th:checked="${rough}" />
+                    </div>
+                    <div id="rough-char" class="form-group">
+                        Rough
+                    </div>
+                    <button type="submit" class="btn btn-default">Search</button>
+                </form>
+
+                <!-- 登录时显示用户信息 -->
+                <ul sec:authorize="isAuthenticated()" class="nav navbar-nav navbar-right">
+                    <li><a id="iconFrame" th:href="@{/user/icon}"><img class="icon img-circle" th:src="@{/img/} + ${#authentication.principal.iconUrl}" /></a></li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" th:text="${#authentication.principal.username}"><span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a th:href="@{/user}">Modify info</a></li>
+                            <li><a th:href="@{/membership/my}">My groups</a></li>
+                            <li><a th:href="@{/friend/my}">My friends</a></li>
+                            <li><a th:href="@{/task/my}">My tasks</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">And more...</a></li>
+                        </ul>
+                    </li>
+                    <li><a th:href="@{/logout}">Logout</a> </li>
+                </ul>
+
+                <!-- 未登录时提示注册或登录 -->
+                <ul sec:authorize="!isAuthenticated()" class="nav navbar-nav navbar-right">
+                    <li><a>Welcome To DoItTogether Platform!</a></li>
+                    <li><a th:href="@{/register}">Register</a></li>
+                    <li><a th:href="@{/login}">Login</a></li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+    <!-- 用于取出各种提示信息 -->
+    <p id="top-msg" th:text="${msg == null ? '' : msg} + ${param.loginError == null ? '' : session.SPRING_SECURITY_LAST_EXCEPTION.message}"></p>
+    <!--<p th:if="${useLoginMsg == null || !useLoginMsg}" class="top-msg" th:text="${msg}"></p>-->
+    <!--<p th:if="${useLoginMsg != null && useLoginMsg}" class="top-msg" th:text="${param.error == null ? '' : session.SPRING_SECURITY_LAST_EXCEPTION.message}"></p>-->
+</div>
+
+<!-- 用于递归调用展示任务，GroupTalk页面用的 -->
+<details th:attr="my-open=${task.status == 'Sons doing'}" th:fragment="showTaskList(list,level)" th:each="task : ${list}" th:class="'level' + ${level}">
+    <summary>
+        <span th:style="'text-align: left; padding-left: ' + ${(level - 1) * 20 + 8} + 'px;'"><a th:href="@{/task/} + ${task.id}" th:text="${task.title}"></a></span>
+        <span th:text="${task.content}"></span>
+        <span th:text="${#dates.format(task.pubTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+        <span th:text="${task.finTime == null ? '-' : #dates.format(task.finTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+        <span th:text="${task.status}" th:style="'color: ' + ${task.statusColor} + ';'"></span>
+        <span th:if="${task.acceptorPubInfo == null}">-</span>
+        <span th:if="${task.acceptorPubInfo != null}"><a th:text="${task.acceptorPubInfo.userPubInfo.username}" th:href="@{/user/} + ${task.acceptorPubInfo.userPubInfo.id}"></a></span>
+        <span th:text="${task.result == null ? '-' : task.result}"></span>
+        <span>
+            <button class="btn btn-default btn-xs" onclick="optFunction(this)" th:attr="opt='acc',tid=${task.id}" th:if="${task.acceptorPubInfo == null && task.hasSon == false}">Accept</button>
+            <button class="btn btn-default btn-xs" onclick="optFunction(this)" th:attr="opt='del',tid=${task.id}" th:if="${task.acceptorPubInfo != null && task.acceptorPubInfo.id == myMembership.id && task.finTime == null}">Give up</button>
+            <button class="btn btn-default btn-xs" onclick="optFunction(this)" th:attr="opt='fin',tid=${task.id}" th:if="${task.acceptorPubInfo != null && task.acceptorPubInfo.id == myMembership.id && task.finTime == null}">Finish</button>
+            <button class="btn btn-default btn-xs" onclick="delTaskFunction(this)" th:attr="tid=${task.id}" th:if="${isAdmin && !task.hasSon && task.acceptorPubInfo == null}">Delete</button>
+        </span>
+        <div th:class="'progress-bar ' + ${task.hasSon ? 'father-bar' : 'son-bar'}" th:style="'width: ' + ${task.progress * 100} + '%;'"></div>
+    </summary>
+    <p th:if="${task.hasSon}" th:replace="fragments::showTaskList(${task.sons}, ${level + 1})"></p>
+</details>
+
+<!-- 用于递归调用展示任务，TaskList页面用的，和上面的区别仅仅在于各种操作按钮上 -->
+<details th:attr="my-open=${task.status == 'Sons doing'}" th:fragment="showTaskList1(list,level)" th:each="task : ${list}" th:class="'level' + ${level}">
+    <summary>
+        <span th:style="'text-align: left; padding-left: ' + ${(level - 1) * 20 + 8} + 'px;'"><a th:href="@{/task/} + ${task.id}" th:text="${task.title}"></a></span>
+        <span th:text="${task.content}"></span>
+        <span th:text="${#dates.format(task.pubTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+        <span th:text="${task.finTime == null ? '-' : #dates.format(task.finTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+        <span th:text="${task.status}" th:style="'color: ' + ${task.statusColor} + ';'"></span>
+        <span th:if="${task.acceptorPubInfo == null}">-</span>
+        <span th:if="${task.acceptorPubInfo != null}"><a th:text="${task.acceptorPubInfo.userPubInfo.username}" th:href="@{/user/} + ${task.acceptorPubInfo.userPubInfo.id}"></a></span>
+        <span th:text="${task.result == null ? '-' : task.result}"></span>
+        <span>
+            <button class="btn btn-default btn-xs" onclick="optFunction(this)" th:attr="opt='del',tid=${task.id}" th:if="${task.finTime == null}">Give up</button>
+            <button class="btn btn-default btn-xs" onclick="optFunction(this)" th:attr="opt='fin',tid=${task.id}" th:if="${task.finTime == null}">Finish</button>
+        </span>
+        <div class="progress-bar" th:style="'width: ' + ${task.progress * 100} + '%;'"></div>
+    </summary>
+    <p th:if="${task.hasSon}" th:replace="fragments::showTaskList1(${task.sons}, ${level + 1})"></p>
+</details>
+
+<!-- 抽取所有页面的底部信息 -->
+<div th:fragment="footer" class="footer"></div>
+
+<!-- 引入JQuery -->
+<script th:fragment="jquery" th:src="@{/webjars/jquery/3.3.1/jquery.min.js}" ></script>
+
+<!-- 引入Bootstrap的JS插件 -->
+<script th:fragment="bootstrapJS" th:src="@{/webjars/bootstrap/3.4.1/js/bootstrap.min.js}"></script>
+
+<script th:fragment="usefulFunctions">
+    //判断字符串是否为null或空字符串
+    function isEmptyStr(obj){
+        return (typeof obj === "undefined" || obj == null || obj === "")
+    }
+    //字符串首字母变为大写
+    function firstCharToBig(obj){
+        return obj.charAt(0).toUpperCase() + obj.substr(1);
+    }
+</script>
+
+</body>
+</html>
