@@ -15,9 +15,9 @@ spring:
     cache: false
   #邮件模块用于发送邮件的邮箱及其相关配置
   mail:
-    host: smtp.163.com
-    username: 13719217231@163.com
-    password: wyysysushen6601
+    host: 
+    username: 
+    password: 
     properties:
       mail.smtp.ssl.enable: true
       mail.smtp.auth: true
