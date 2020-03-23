@@ -22,8 +22,8 @@ public class UserController extends BaseController {
     @Autowired
     private UserService userService;
 
-    @Value("${dit.upload-photo-dir}")
-    private String tarDir;
+    @Autowired
+    private String imgDir;
 
     @GetMapping
     public ModelAndView toModifyMyInfoPage(){
@@ -103,7 +103,7 @@ public class UserController extends BaseController {
 
         //保存文件
         try {
-            icon.transferTo(new File(tarDir + "user", filename));
+            icon.transferTo(new File(imgDir + "user", filename));
         }
         //如果图片保存失败，则把错误信息告知用户并转发回上传头像页面
         catch (Exception e) {

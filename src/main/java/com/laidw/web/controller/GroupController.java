@@ -35,8 +35,8 @@ public class GroupController extends BaseController {
     @Autowired
     private MembershipController membershipController;
 
-    @Value("${dit.upload-photo-dir}")
-    private String tarDir;
+    @Autowired
+    private String imgDir;
 
     @GetMapping
     public String toCreateGroupPage(){
@@ -83,7 +83,7 @@ public class GroupController extends BaseController {
 
         //保存文件
         try {
-            icon.transferTo(new File(tarDir + "group", filename));
+            icon.transferTo(new File(imgDir + "group", filename));
         }
         //如果图片保存失败，则把错误信息告知用户并转发回上传头像页面
         catch (Exception e) {
