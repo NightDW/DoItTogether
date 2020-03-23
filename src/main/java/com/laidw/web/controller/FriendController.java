@@ -20,7 +20,7 @@ public class FriendController extends BaseController {
     @Autowired
     private FriendshipService friendshipService;
 
-    @Value("${dit.system-user.request-friend-msg}")
+    @Value("${dit.request-friend-msg}")
     private String requestFriendMsg;
 
     @GetMapping("/request/{gid}")

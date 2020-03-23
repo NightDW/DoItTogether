@@ -28,7 +28,7 @@ public class MembershipServiceImpl implements MembershipService {
     @Autowired
     private TaskService taskService;
 
-    @Value("${dit.system-user.join-in-group-msg}")
+    @Value("${dit.join-in-group-msg}")
     private String joinInGroupMsg;
 
     @Autowired

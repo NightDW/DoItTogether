@@ -1,0 +1,61 @@
+spring:
+  #配置Druid连接池，高版本的SpringBoot的连接驱动发生了改变，且自动执行SQL文件时需要额外的配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/dit?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+    username: root
+    password: 1234
+    schema: classpath:schema.sql
+    schema-username: root
+    schema-password: 1234
+    initialization-mode: always
+  #Thymeleaf配置，主要是关闭缓存
+  thymeleaf:
+    cache: false
+  #邮件模块用于发送邮件的邮箱及其相关配置
+  mail:
+    host: smtp.163.com
+    username: 13719217231@163.com
+    password: wyysysushen6601
+    properties:
+      mail.smtp.ssl.enable: true
+      mail.smtp.auth: true
+      smtp.starttls.enable: true
+      smtp.starttls.required: true
+
+#MyBatis配置，注意关闭自动映射，防止查询公开信息时自动把非公开信息也映射了
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    auto-mapping-behavior: none
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#自定义的属性
+dit:
+  #用于指定上传的头像的绝对存储路径，也就是resources/static/img目录的绝对路径，最好以"/"结尾
+  upload-photo-dir: C:/Users/Acer/Desktop/IdeaPros/DoItTogether/src/main/resources/static/img/
+
+  #指定默认的头像名称
+  default-user-img: user/default.png
+  default-group-img: group/default.jpg
+
+  #一些默认的消息模板
+  request-friend-msg: 用户#user请求添加您为好友，TA提供的认证信息为：#remarks。#link。
+  become-friend-msg: 我们已经是好友啦，可以开始聊天了~
+  join-in-group-msg: 大家好，请多多指教~
+
+  #系统通知小助手的各个属性（其它用户在注册时将自动添加系统通知小助手为好友）
+  #这里出现了中文，所以建议使用yml配置文件；如果是properties文件，则需要：
+  #在IDEA中把properties配置文件的编码改为utf8，并勾选native-to-ascii conversion
+  system-user:
+    username: DIT小助手
+    password: 23333333333
+    icon-url: user/assistant.jpg
+    email: assistant@dit.com
+    phone: 23333333333
+    gender: true
+    role: SYSTEM
+    is-valid: false
+    verify-code: dit_assistant
+    nickname: 已退群用户

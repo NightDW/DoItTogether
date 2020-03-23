@@ -28,7 +28,7 @@ public class FriendshipServiceImpl implements FriendshipService {
     @Autowired
     private MessageService messageService;
 
-    @Value("${dit.system-user.become-friend-msg}")
+    @Value("${dit.become-friend-msg}")
     private String becomeFriendMsg;
 
     public int insertFriendship(Integer hid, Integer gid, String remarks) {
