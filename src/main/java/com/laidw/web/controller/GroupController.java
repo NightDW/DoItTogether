@@ -67,7 +67,7 @@ public class GroupController extends BaseController {
     }
 
     @PostMapping("/icon/{gid}")
-    public ModelAndView doUserIconUpload(MultipartFile icon, HttpServletRequest request, @PathVariable Integer gid) {
+    public ModelAndView doGroupIconUpload(MultipartFile icon, HttpServletRequest request, @PathVariable Integer gid) {
         ModelAndView mav;
 
         //如果用户没上传图片或上传的文件不是图片，则把错误信息告知用户并转发回上传头像页面

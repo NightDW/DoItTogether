@@ -100,10 +100,10 @@
     <p th:if="${task.hasSon}" th:replace="fragments::showTaskList(${task.sons}, ${level + 1})"></p>
 </details>
 
-<!-- 用于递归调用展示任务，TaskList页面用的，和上面的区别仅仅在于各种操作按钮上 -->
+<!-- 用于递归调用展示任务，TaskList页面用的，和上面的区别主要在于各种操作按钮上 -->
 <details th:attr="my-open=${task.status == 'Sons doing'}" th:fragment="showTaskList1(list,level)" th:each="task : ${list}" th:class="'level' + ${level}">
     <summary>
-        <span th:style="'text-align: left; padding-left: ' + ${(level - 1) * 20 + 8} + 'px;'"><a th:href="@{/task/} + ${task.id}" th:text="${task.title}"></a></span>
+        <span th:style="'text-align: left; padding-left: ' + ${(level - 1) * 20 + 8} + 'px;'" th:text="${task.title}"></span>
         <span th:text="${task.content}"></span>
         <span th:text="${#dates.format(task.pubTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
         <span th:text="${task.finTime == null ? '-' : #dates.format(task.finTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
