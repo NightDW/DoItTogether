@@ -104,7 +104,7 @@
             </div>
             <div class="right-bottom-part">
                 <button id="send-msg-btn" th:class="'btn btn-lg btn-primary' + ${myMembership.isMute ? 'disabled' : ''}" onclick="sendMsgFunction()" type="button">Send</button>
-                <input id="text" th:class="'form-control-static' + ${myMembership.isMute ? 'disabled' : ''}" placeholder="Say something..." />
+                <input id="text" th:disabled="${myMembership.isMute}" class="form-control-static" placeholder="Say something..." />
             </div>
         </div>
 
