@@ -103,8 +103,8 @@
                 </div>
             </div>
             <div class="right-bottom-part">
-                <button id="send-msg-btn" class="btn btn-lg btn-primary" onclick="sendMsgFunction()" type="button">Send</button>
-                <input id="text" class="form-control-static" placeholder="Say something..." />
+                <button id="send-msg-btn" th:class="'btn btn-lg btn-primary' + ${myMembership.isMute ? 'disabled' : ''}" onclick="sendMsgFunction()" type="button">Send</button>
+                <input id="text" th:class="'form-control-static' + ${myMembership.isMute ? 'disabled' : ''}" placeholder="Say something..." />
             </div>
         </div>
 
@@ -280,7 +280,7 @@
             data: data,
             success: function (result) {
                 if(isEmptyStr(result) || result === 'Failed')
-                    $("#top-msg").text("Failed to send message!");
+                    $("#top-msg").text("You have no right to send message!");
                 else{
                     var id = '[[${#authentication.principal.id}]]';
                     var username = '[[${#authentication.principal.username}]]';
