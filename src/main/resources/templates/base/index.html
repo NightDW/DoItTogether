@@ -24,6 +24,8 @@
 
 <!-- 在此添加页面主体信息 -->
 <div class="jumbotron">
+
+    <!-- 一些提示信息 -->
     <h1>DoItTogether</h1>
     <p>Welcome to DoItTogether(DIT) Platform!</p>
     <p>
@@ -31,15 +33,20 @@
         talk with them, or have a private communication with your friends!
     </p>
     <p>Just have fun!</p>
+
+    <!-- 如果用户未登录，则提醒用户登录 -->
     <p sec:authorize="!isAuthenticated()">Oh! You are not signed in! You can:</p>
     <p sec:authorize="!isAuthenticated()">
         <a class="btn btn-primary btn-lg" th:href="@{/register}" role="button">Register</a>
         <a class="btn btn-primary btn-lg" th:href="@{/login}" role="button">Login</a>
     </p>
+
+    <!-- 如果用户登录了，则提供一个创建群组的链接 -->
     <p sec:authorize="isAuthenticated()">Now you are signed in, you can search for what you are interested in or:</p>
     <p sec:authorize="isAuthenticated()">
         <a id="create-group-btn" class="btn btn-primary btn-lg" th:href="@{/group}" role="button">Create a group</a>
     </p>
+
 </div>
 
 <!-- 引入底部信息 -->

@@ -12,22 +12,54 @@ import java.util.List;
 @Mapper
 public interface FriendshipMapper {
 
-    //host将guest添加为好友时调用该方法
+    /**
+     * 插入方法
+     * @param friendship 插入的信息，至少需要提供hostId和guestId
+     * @return 受影响的行数
+     */
     int insertFriendship(Friendship friendship);
 
-    //删除方法
-    int deleteFriendship(@Param("hid") Integer hid, @Param("gid") Integer gid);
+    /**
+     * 根据hostId和guestId进行删除
+     * @param hid hostId
+     * @param gid guestId
+     * @return 受影响的行数
+     */
+    int deleteFriendshipByHG(@Param("hid") Integer hid, @Param("gid") Integer gid);
 
-    //根据hostId和guestId有选择性地修改信息
-    int updateFriendshipSelectively(Friendship friendship);
+    /**
+     * 根据hostId和guestId有选择性地修改信息
+     * @param friendship 至少需要提供hostId和guestId
+     * @return 受影响的行数
+     */
+    int updateFriendshipByHGSelectively(Friendship friendship);
 
+    /**
+     * 根据id有选择性地修改信息
+     * @param friendship 至少需要提供id
+     * @return 受影响的行数
+     */
     int updateFriendshipByIdSelectively(Friendship friendship);
 
+    /**
+     * 根据id查找Friendship
+     * @param id Friendship的id
+     * @return 查找结果
+     */
     Friendship selectFriendshipById(Integer id);
 
-    //根据hostId和guestId查询记录
-    Friendship selectFriendship(@Param("hid") Integer hid, @Param("gid") Integer gid);
+    /**
+     * 根据hostId和guestId查询Friendship
+     * @param hid hostId
+     * @param gid guestId
+     * @return 查找结果
+     */
+    Friendship selectFriendshipByHG(@Param("hid") Integer hid, @Param("gid") Integer gid);
 
-    //查找某个人的所有好友
+    /**
+     * 查找某个人的所有好友
+     * @param hid hostId
+     * @return 查找结果
+     */
     List<Friendship> selectFriendshipsByHostId(Integer hid);
 }

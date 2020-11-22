@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 用于配置系统通知用户，由于涉及的代码较多，因此单独抽取到一个配置类中
+ * 用于将系统通知用户从数据库中查询出来并放入IOC容器
+ * 系统通知用户可用于给其他用户发送系统消息
  */
 @Configuration
 public class SystemUserConfig {
@@ -22,6 +23,9 @@ public class SystemUserConfig {
 
     @Value("${dit.system-user.password}")
     private String password;
+
+    @Value("${dit.system-user.introduction}")
+    private String introduction;
 
     @Value("${dit.system-user.icon-url}")
     private String iconUrl;
@@ -52,16 +56,17 @@ public class SystemUserConfig {
         condition.setUsername(username);
         User user = userMapper.selectUserPubInfoByCondition(condition);
 
-        //如果存在，则将查询结果返回
+        //如果存在，则将查询结果放到IOC容器中
         if(user != null){
             //System.out.println("System User Id: " + user.getId());
             return user;
         }
 
-        //如果不存在，则插入数据后把结果返回
+        //如果不存在，则先插入数据
         User systemUserTemplate = new User();
         systemUserTemplate.setUsername(username);
         systemUserTemplate.setPassword(password);
+        systemUserTemplate.setIntroduction(introduction);
         systemUserTemplate.setIconUrl(iconUrl);
         systemUserTemplate.setEmail(email);
         systemUserTemplate.setPhone(phone);
@@ -70,6 +75,7 @@ public class SystemUserConfig {
         systemUserTemplate.setIsValid(isValid);
         systemUserTemplate.setVerifyCode(verifyCode);
         userMapper.insertUser(systemUserTemplate);
+
         //System.out.println("System User Id: " + systemUserTemplate.getId());
         return systemUserTemplate;
     }

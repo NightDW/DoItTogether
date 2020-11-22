@@ -18,7 +18,6 @@
 
     <!-- 插入表时涉及的类的属性 -->
     <sql id="insertClassAtts">
-        <!--(#{isPrivate}, #{accId}, <if test="isPrivate == true">#{senderPubInfo.id}</if><if test="isPrivate == false">#{senderPubInfo.userPubInfo.id}</if>, #{sendTime}, #{content})-->
         (#{isPrivate}, #{accId}, #{senderPubInfo.id}, #{sendTime}, #{content})
     </sql>
 
@@ -38,17 +37,20 @@
         <result column="acc_id" property="accId" />
         <result column="send_time" property="sendTime" />
         <result column="content" property="content" />
+
+        <!-- 根据is_private字段进行更进一步的封装 -->
         <discriminator javaType="boolean" column="is_private">
+
             <case value="true">
                 <association property="senderPubInfo" column="sender_id" javaType="com.laidw.entity.User"
                              select="com.laidw.mapper.UserMapper.selectUserPubInfoById" />
             </case>
+
             <case value="false">
-                <!--<association property="senderPubInfo" column="{uid=sender_id,gid=acc_id}" javaType="com.laidw.entity.Membership"-->
-                             <!--select="com.laidw.mapper.MembershipMapper.selectMembershipPubInfo" />-->
                 <association property="senderPubInfo" column="sender_id" javaType="com.laidw.entity.Membership"
                              select="com.laidw.mapper.MembershipMapper.selectMembershipPubInfoById" />
             </case>
+
         </discriminator>
     </resultMap>
 
@@ -56,6 +58,7 @@
 
 
     <!-- =============================编写SQL语句============================= -->
+
     <insert id="insertMessage" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO
         <include refid="tableName" />
@@ -63,37 +66,50 @@
         VALUES
         <include refid="insertClassAtts" />
     </insert>
+
     <delete id="deleteMessageById">
         DELETE FROM
         <include refid="tableName" />
         <include refid="whereId" />
     </delete>
-    <delete id="deleteMessagesBetween">
+
+    <delete id="deletePrivateMessagesBetween">
         DELETE FROM
         <include refid="tableName" />
         WHERE is_private = TRUE AND ((sender_id = #{param1} AND acc_id = #{param2}) OR (sender_id = #{param2} AND acc_id = #{param1}))
     </delete>
-    <delete id="deleteMessagesByGroupId">
+
+    <delete id="deleteGroupMessagesByGroupId">
         DELETE FROM
         <include refid="tableName" />
         WHERE is_private = false AND acc_id = #{gid}
     </delete>
+
     <update id="updateGroupMessageSenderId">
         UPDATE
         <include refid="tableName" />
         SET sender_id = #{nid}
         WHERE sender_id = #{oid} AND acc_id = #{gid} AND is_private = 0
     </update>
-    <select id="selectMessagesByGroupId" resultMap="messageMap">
+
+    <select id="selectMessageById" resultMap="messageMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        <include refid="whereId" />
+    </select>
+
+    <select id="selectGroupMessagesByGroupId" resultMap="messageMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE is_private = FALSE AND acc_id = #{gid}
     </select>
-    <select id="selectMessagesBetween" resultMap="messageMap">
+
+    <select id="selectPrivateMessagesBetween" resultMap="messageMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE is_private = TRUE AND ((sender_id = #{param1} AND acc_id = #{param2}) OR (sender_id = #{param2} AND acc_id = #{param1}))
     </select>
+
     <!-- =============================编写SQL语句============================= -->
 
 </mapper>

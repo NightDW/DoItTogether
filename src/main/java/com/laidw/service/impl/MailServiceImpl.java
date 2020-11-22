@@ -17,7 +17,7 @@ import java.io.File;
 import java.util.Map;
 
 /**
- * MailService接口的实现类，负责发送邮件
+ * MailService的实现类
  */
 @Service
 @Transactional
@@ -32,7 +32,7 @@ public class MailServiceImpl implements MailService {
     @Autowired
     private TemplateEngine engine;
 
-    @Override
+
     public void sendSimpleMail(String sendTo, String title, String content) {
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setFrom(sendFrom);
@@ -42,7 +42,6 @@ public class MailServiceImpl implements MailService {
         jms.send(msg);
     }
 
-    @Override
     public void sendAttachmentMail(String sendTo, String title, String content, File file) throws Exception {
         MimeMessage msg = jms.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(msg, true);
@@ -56,7 +55,6 @@ public class MailServiceImpl implements MailService {
         jms.send(msg);
     }
 
-    @Override
     public void sendTemplateMail(String sendTo, String title, String templateName, Map<String, Object> map) throws Exception{
         MimeMessage msg = jms.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(msg, false);

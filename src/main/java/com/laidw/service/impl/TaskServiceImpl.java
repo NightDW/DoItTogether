@@ -12,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * TaskService的实现类
+ */
 @Service
 @Transactional
 public class TaskServiceImpl implements TaskService {
@@ -19,7 +22,8 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private TaskMapper taskMapper;
 
-    public int insertTask(Integer gid, String title, String content) {
+
+    public int insertLeafTaskReturnId(Integer gid, String title, String content) {
         Task task = new Task();
         task.setPubTime(new Date());
         task.setTitle(title);
@@ -30,14 +34,24 @@ public class TaskServiceImpl implements TaskService {
         return task.getId();
     }
 
-    public void deleteTaskById(Integer id) {
-        //先删除其子任务，再删除该任务
-        //删除之后再看看它本来的父任务是否还有子任务，没有的话需要把它设置为非父任务
-        taskMapper.deleteTaskRecordsByFatherId(id);
+    public void deleteFullTaskById(Integer id) {
         Task task = taskMapper.selectTaskById(id);
-        taskMapper.deleteTaskRecordById(id);
+
+        //如果不是叶子任务，则先删除其子任务
+        if(task.getHasSon()){
+            for(Task son : task.getSons()){
+                deleteFullTaskById(son.getId());
+            }
+        }
+
+        //然后再删除本条记录
+        taskMapper.deleteTaskById(id);
+
+        //如果本任务没有父任务，则直接结束
         if(task.getFatherId() == null)
             return;
+
+        //否则看它本来的父任务是否还有子任务，没有的话需要把它设置为非父任务
         List<Task> list = taskMapper.selectTasksByFatherId(task.getFatherId());
         if(list == null || list.size() == 0){
             task = new Task(task.getFatherId());
@@ -46,10 +60,11 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
-    public void deleteTasksByGroupId(Integer gid) {
+    public void deleteAllTasksByGroupId(Integer gid) {
+
         //先把该群的所有任务的父任务置为空，再删除这些任务
         taskMapper.clearTasksFatherIdInThisGroup(gid);
-        taskMapper.deleteTaskRecordsByGroupId(gid);
+        taskMapper.deleteTasksByGroupId(gid);
     }
 
     public int updateTaskByIdSelectively(Task task) {
@@ -57,10 +72,14 @@ public class TaskServiceImpl implements TaskService {
     }
 
     public void splitTask(Integer fatherId, Integer groupId, List<Task> sonsBaseInfo) {
+
+        //先将被切分的任务设为父任务
         Task father = new Task();
         father.setId(fatherId);
         father.setHasSon(true);
         taskMapper.updateTaskByIdSelectively(father);
+
+        //然后插入子任务的信息
         for(Task son : sonsBaseInfo){
             son.setPubTime(new Date());
             son.setGroupId(groupId);
@@ -71,10 +90,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     public int acceptTask(Integer mid, Integer uid, Integer tid) {
-        Task task = new Task();
-        task.setId(tid);
         Membership membership = new Membership(mid);
         membership.setUserPubInfo(new User(uid));
+
+        Task task = new Task();
+        task.setId(tid);
         task.setAcceptorPubInfo(membership);
         return taskMapper.updateTaskByIdSelectively(task);
     }
@@ -85,41 +105,46 @@ public class TaskServiceImpl implements TaskService {
         task.setFinTime(new Date());
         task.setResult(result);
         taskMapper.updateTaskByIdSelectively(task);
-        //完成之后需要检查它是否是子任务
-        //如果是子任务，则需要判断它的父任务进度是否达到100%，如果是，则父任务也完成
+
+        //完成之后需要检查它是否有父任务
+        //如果有，则需要判断它的父任务进度是否达到100%，如果是，则父任务也完成
         Task finTask = taskMapper.selectTaskById(tid);
         if(finTask.getFatherId() == null)
             return;
-        Task fatherTask = taskMapper.selectTaskById(finTask.getFatherId());
+        Task fatherTask = taskMapper.selectFullTaskById(finTask.getFatherId());
         if(fatherTask.getProgress() == 1.0)
             finishTask(fatherTask.getId(), "All sons done");
     }
 
-    public int giveUpTask(Integer tid) {
-        return taskMapper.clearTaskAcceptorById(tid);
+    public int giveUpThisUnfinishedTask(Integer tid) {
+        return taskMapper.clearUnfinishedTaskAcceptorById(tid);
     }
 
-    public int giveUpMyUnfinishedTaskInThisGroup(Integer mid, Integer gid) {
-        return taskMapper.clearUnfinishedTasksAcceptor(mid, gid);
+    public int giveUpMyUnfinishedTasksInThisGroup(Integer mid, Integer gid) {
+        return taskMapper.giveUpMyUnfinishedTasksInThisGroup(mid, gid);
     }
 
-    public int updateFinishedTaskAcceptorInThisGroup(Integer oldMid, Integer newMid, Integer newUid, Integer groupId) {
-        return taskMapper.updateFinishedTaskAccIdInThisGroup(oldMid, newMid, newUid, groupId);
+    public int transferFinishedTaskAccIdInThisGroup(Integer oldMid, Integer newMid, Integer newUid, Integer groupId) {
+        return taskMapper.transferFinishedTaskAccIdInThisGroup(oldMid, newMid, newUid, groupId);
     }
 
     public Task selectTaskById(Integer id) {
         return taskMapper.selectTaskById(id);
     }
 
-    public List<Task> selectTasksByFatherId(Integer tid) {
-        return taskMapper.selectTasksByFatherId(tid);
+    public Task selectFullTaskById(Integer id) {
+        return taskMapper.selectFullTaskById(id);
+    }
+
+    public List<Task> selectFullTasksByFatherId(Integer tid) {
+        return taskMapper.selectFullTasksByFatherId(tid);
     }
 
     public List<Task> selectTasksByAccUserId(Integer uid) {
         return taskMapper.selectTasksByAccUserId(uid);
     }
 
-    public List<Task> selectRootTasksByGroupId(Integer gid) {
-        return taskMapper.selectRootTasksByGroupId(gid);
+    public List<Task> selectRootFullTasksByGroupId(Integer gid) {
+        return taskMapper.selectRootFullTasksByGroupId(gid);
     }
 }

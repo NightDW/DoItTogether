@@ -60,13 +60,14 @@
         <association property="guestPubInfo" column="guest_id"
                      select="com.laidw.mapper.UserMapper.selectUserPubInfoById" />
         <collection property="messages" column="{param1=host_id,param2=guest_id}"
-                    select="com.laidw.mapper.MessageMapper.selectMessagesBetween" />
+                    select="com.laidw.mapper.MessageMapper.selectPrivateMessagesBetween" />
     </resultMap>
 
     <!-- =============================定义封装规则============================= -->
 
 
     <!-- =============================编写SQL语句============================= -->
+
     <insert id="insertFriendship" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO
         <include refid="tableName" />
@@ -74,12 +75,14 @@
         VALUES
         <include refid="insertClassAtts" />
     </insert>
-    <delete id="deleteFriendship">
+
+    <delete id="deleteFriendshipByHG">
         DELETE FROM
         <include refid="tableName" />
         WHERE host_id = #{hid} AND guest_id = #{gid}
     </delete>
-    <update id="updateFriendshipSelectively">
+
+    <update id="updateFriendshipByHGSelectively">
         UPDATE
         <include refid="tableName" />
         <set>
@@ -87,6 +90,7 @@
         </set>
         WHERE host_id = #{hostId} AND guest_id = #{guestPubInfo.id}
     </update>
+
     <update id="updateFriendshipByIdSelectively">
         UPDATE
         <include refid="tableName" />
@@ -95,21 +99,25 @@
         </set>
         <include refid="whereId" />
     </update>
+
     <select id="selectFriendshipById" resultMap="friendshipMap">
         SELECT * FROM
         <include refid="tableName" />
         <include refid="whereId" />
     </select>
-    <select id="selectFriendship" resultMap="friendshipMap">
+
+    <select id="selectFriendshipByHG" resultMap="friendshipMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE host_id = #{hid} AND guest_id = #{gid}
     </select>
+
     <select id="selectFriendshipsByHostId" resultMap="friendshipMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE host_id = #{hid}
     </select>
+
     <!-- =============================编写SQL语句============================= -->
 
 </mapper>

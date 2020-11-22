@@ -5,9 +5,10 @@ import lombok.*;
 
 /**
  * 用于保存用户在某个群组内的信息
+ * 该类同样实现了Comparable接口，用于排序
  */
 @Getter@Setter
-@NoArgsConstructor@AllArgsConstructor
+@NoArgsConstructor
 public class Membership implements Comparable<Membership>{
 
     /**
@@ -51,18 +52,23 @@ public class Membership implements Comparable<Membership>{
     private Boolean isTop;
 
     /**
-     * 根据isTop isShow groupPubInfo.id来计算该Membership的评价值，评价值用于排序
+     * 实现比较方法
+     * @param o 被比较的对象
+     * @return 返回值表示要根据value值从大到小进行排序
+     */
+    public int compareTo(Membership o) {
+        return o.getValue() - getValue();
+    }
+
+    /**
+     * 根据id isTop isShow来计算该Membership的评价值，评价值用于排序
      * @return 该对象的评价值，评价值越高排序应该越靠前
      */
     public int getValue(){
-        return - id + (isTop ? 1000 : 0) - (isShow ? 0 : 10000);
+        return - id + (isTop ? 100000 : 0) - (isShow ? 0 : 1000000);
     }
 
     public Membership(Integer id) {
         this.id = id;
-    }
-
-    public int compareTo(Membership o) {
-        return o.getValue() - getValue();
     }
 }

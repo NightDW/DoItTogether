@@ -12,10 +12,12 @@ import java.util.List;
 
 /**
  * 用于保存DIT平台上注册的账户的信息
+ * 实现UserDetails接口，让SpringSecurity也能够获取到用户信息
  */
 @Getter@Setter
-@NoArgsConstructor@AllArgsConstructor
+@NoArgsConstructor
 public class User implements UserDetails {
+
     /**
      * 账户的id
      */
@@ -32,7 +34,7 @@ public class User implements UserDetails {
     private String password;
 
     /**
-     * 用户的个性签名
+     * 用户的个性签名/自我介绍
      */
     private String introduction;
 
@@ -52,7 +54,7 @@ public class User implements UserDetails {
     private String phone;
 
     /**
-     * 账户的性别
+     * 账户的性别，true表示男，false表示女
      */
     private Boolean gender;
 
@@ -72,19 +74,17 @@ public class User implements UserDetails {
     private String verifyCode;
 
     /**
-     * 该用户的好友
+     * 该用户的好友关系
      */
     private List<Friendship> friendships;
 
     /**
-     * （该用户加入的任务群，包括该用户创建的任务群）
-     * （private List&lt;Group&gt; joinedGroups）
-     * 该用户加入的群，以及在该群中的角色等信息
+     * 该用户加入（包括自己创建）的群，以及在该群中的角色等信息
      */
     private List<Membership> memberships;
 
     /**
-     * 该用户接受的任务，注意我们不需要过多地关心该用户发布的任务
+     * 该用户接收的任务，注意我们不需要过多地关心该用户发布的任务
      * 必要时只需要在任务的详细信息中展示发布者的信息即可
      */
     private List<Task> acceptedTasks;

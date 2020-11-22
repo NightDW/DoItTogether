@@ -1,7 +1,7 @@
-package com.laidw.web.controller.tools;
+package com.laidw.web.tools;
 
 /**
- * 用于记录各个模板页面的位置
+ * 一个工具类，用于记录各个模板页面的位置
  */
 public class HtmlPageHelper {
     public static String FORGET = "base/forget";

@@ -12,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * MessageService的实现类
+ */
 @Service
 @Transactional
 public class MessageServiceImpl implements MessageService {
@@ -22,11 +25,12 @@ public class MessageServiceImpl implements MessageService {
     @Autowired
     private User systemUser;
 
+
     public int sendSystemMsgTo(Integer uid, String content) {
-        return sendMsg(true, systemUser.getId(), uid, content);
+        return sendMsgReturnId(true, systemUser.getId(), uid, content);
     }
 
-    public int sendMsg(Boolean isPrivate, Integer senderId, Integer acceptorId, String content) {
+    public int sendMsgReturnId(Boolean isPrivate, Integer senderId, Integer acceptorId, String content) {
         Message msg = new Message();
         msg.setIsPrivate(isPrivate);
         msg.setAccId(acceptorId);
@@ -41,23 +45,27 @@ public class MessageServiceImpl implements MessageService {
         return messageMapper.deleteMessageById(id);
     }
 
-    public int deleteMessagesBetween(Integer id1, Integer id2) {
-        return messageMapper.deleteMessagesBetween(id1, id2);
+    public int deletePrivateMessagesBetween(Integer id1, Integer id2) {
+        return messageMapper.deletePrivateMessagesBetween(id1, id2);
     }
 
-    public int deleteMessagesByGroupId(Integer gid) {
-        return messageMapper.deleteMessagesByGroupId(gid);
+    public int deleteGroupMessagesByGroupId(Integer gid) {
+        return messageMapper.deleteGroupMessagesByGroupId(gid);
     }
 
     public int updateGroupMessageSenderId(Integer oldId, Integer newId, Integer groupId) {
         return messageMapper.updateGroupMessageSenderId(oldId, newId, groupId);
     }
 
-    public List<Message> selectMessagesByGroupId(Integer gid) {
-        return messageMapper.selectMessagesByGroupId(gid);
+    public Message selectMessageById(Integer id) {
+        return messageMapper.selectMessageById(id);
     }
 
-    public List<Message> selectMessagesBetween(Integer id1, Integer id2) {
-        return messageMapper.selectMessagesBetween(id1, id2);
+    public List<Message> selectGroupMessagesByGroupId(Integer gid) {
+        return messageMapper.selectGroupMessagesByGroupId(gid);
+    }
+
+    public List<Message> selectPrivateMessagesBetween(Integer id1, Integer id2) {
+        return messageMapper.selectPrivateMessagesBetween(id1, id2);
     }
 }

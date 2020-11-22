@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * UserService的实现类
+ */
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
@@ -24,13 +27,18 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private User systemUser;
 
-    @Value("${dit.default-user-img}")
+    @Value("${dit.img.default-img.user}")
     private String userImg;
 
+
     public void insertUser(User user) {
+
+        //设置默认的头像
         if(user.getIconUrl() == null)
             user.setIconUrl(userImg);
         userMapper.insertUser(user);
+
+        //同时自动添加系统用户为好友
         friendshipService.insertFriendship(user.getId(), systemUser.getId(), null);
     }
 

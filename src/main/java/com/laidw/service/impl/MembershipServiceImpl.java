@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * MembershipService的实现类
+ */
 @Service
 @Transactional
 public class MembershipServiceImpl implements MembershipService {
@@ -28,14 +31,14 @@ public class MembershipServiceImpl implements MembershipService {
     @Autowired
     private TaskService taskService;
 
-    @Value("${dit.join-in-group-msg}")
+    @Value("${dit.msg.join-in-group}")
     private String joinInGroupMsg;
 
     @Autowired
     private User systemUser;
 
-    //这里的返回值为插入的Membership的id值
-    public int insertMembership(Integer uid, Integer gid, Role role, String nickname){
+
+    public int insertMembershipReturnId(Integer uid, Integer gid, Role role, String nickname){
         Membership membership = new Membership();
         membership.setUserPubInfo(new User(uid));
         membership.setGroupPubInfo(new Group(gid));
@@ -53,32 +56,41 @@ public class MembershipServiceImpl implements MembershipService {
     }
 
     public void joinGroup(Integer uid, Integer gid, Role role, String nickname) {
-        messageService.sendMsg(false, insertMembership(uid, gid, role, nickname), gid, joinInGroupMsg);
+        int mid = insertMembershipReturnId(uid, gid, role, nickname);
+        messageService.sendMsgReturnId(false, mid, gid, joinInGroupMsg);
     }
 
-    //退群前将消息的发送者和已完成的任务接收者改成"已退群用户"，放弃未完成的任务，然后删除该用户的Membership信息
     public void leaveGroup(Integer uid, Integer gid) {
-        Membership userMembership = membershipMapper.selectMembershipPubInfo(uid, gid);
-        Membership systemMembership = membershipMapper.selectMembershipPubInfo(systemUser.getId(), gid);
+        Membership userMembership = membershipMapper.selectMembershipPubInfoByUG(uid, gid);
+        Membership systemMembership = membershipMapper.selectMembershipPubInfoByUG(systemUser.getId(), gid);
 
+        //将消息的发送者和已完成的任务接收者改成"已退群用户"
         messageService.updateGroupMessageSenderId(userMembership.getId(), systemMembership.getId(), gid);
-        taskService.giveUpMyUnfinishedTaskInThisGroup(userMembership.getId(), gid);
-        taskService.updateFinishedTaskAcceptorInThisGroup(userMembership.getId(), systemMembership.getId(), systemUser.getId(), gid);
-        membershipMapper.deleteMembership(uid, gid);
+        taskService.transferFinishedTaskAccIdInThisGroup(userMembership.getId(), systemMembership.getId(), systemUser.getId(), gid);
+
+        //放弃未完成的任务，然后删除该用户的Membership信息
+        taskService.giveUpMyUnfinishedTasksInThisGroup(userMembership.getId(), gid);
+        membershipMapper.deleteMembershipByUG(uid, gid);
     }
 
-    public int updateMembershipSelectively(Membership membership) {
-        return membershipMapper.updateMembershipSelectively(membership);
+    public int updateMembershipByUGSelectively(Membership membership) {
+        return membershipMapper.updateMembershipByUGSelectively(membership);
     }
 
     public int updateMembershipByIdSelectively(Membership membership){
         return  membershipMapper.updateMembershipByIdSelectively(membership);
     }
 
-    public Membership selectMembership(Integer uid, Integer gid, Boolean onlyPubInfo) {
+    public Membership selectMembershipByUG(Integer uid, Integer gid, Boolean onlyPubInfo) {
         if(onlyPubInfo)
-            return membershipMapper.selectMembershipPubInfo(uid, gid);
-        return membershipMapper.selectMembership(uid, gid);
+            return membershipMapper.selectMembershipPubInfoByUG(uid, gid);
+        return membershipMapper.selectMembershipByUG(uid, gid);
+    }
+
+    public Membership selectMembershipById(Integer mid, Boolean onlyPubInfo) {
+        if(onlyPubInfo)
+            return membershipMapper.selectMembershipPubInfoById(mid);
+        return membershipMapper.selectMembershipById(mid);
     }
 
     public List<Membership> selectMembershipsByUserId(Integer uid, Boolean onlyPubInfo) {

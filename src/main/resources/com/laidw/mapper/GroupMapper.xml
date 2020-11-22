@@ -62,15 +62,16 @@
         <collection property="memberships" column="id"
                     select="com.laidw.mapper.MembershipMapper.selectMembershipsPubInfoByGroupId" />
         <collection property="messages" column="id"
-                    select="com.laidw.mapper.MessageMapper.selectMessagesByGroupId" />
+                    select="com.laidw.mapper.MessageMapper.selectGroupMessagesByGroupId" />
         <collection property="tasks" column="id"
-                    select="com.laidw.mapper.TaskMapper.selectRootTasksByGroupId" />
+                    select="com.laidw.mapper.TaskMapper.selectRootFullTasksByGroupId" />
     </resultMap>
 
     <!-- =============================定义封装规则============================= -->
 
 
     <!-- =============================编写SQL语句============================= -->
+
     <insert id="insertGroup" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO
         <include refid="tableName" />
@@ -78,11 +79,13 @@
         VALUES
         <include refid="insertClassAtts" />
     </insert>
+
     <delete id="deleteGroupById">
         DELETE FROM
         <include refid="tableName" />
         <include refid="whereId" />
     </delete>
+
     <update id="updateGroupByIdSelectively">
         UPDATE
         <include refid="tableName" />
@@ -91,26 +94,31 @@
         </set>
         <include refid="whereId" />
     </update>
+
     <select id="selectGroupById" resultMap="fullMap">
         SELECT * FROM
         <include refid="tableName" />
         <include refid="whereId" />
     </select>
+
     <select id="selectGroupPubInfoById" resultMap="onlyPubInfoMap">
         SELECT * FROM
         <include refid="tableName" />
         <include refid="whereId" />
     </select>
+
     <select id="searchGroupsLike" resultMap="onlyPubInfoMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE name LIKE #{key} OR slogan LIKE #{key}
     </select>
+
     <select id="searchGroupsByKey" resultMap="onlyPubInfoMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE name = #{key} OR slogan = #{key}
     </select>
+
     <!-- =============================编写SQL语句============================= -->
 
 </mapper>

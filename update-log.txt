@@ -147,3 +147,14 @@
   - FriendController新增doChangeView()方法和doChangeRemarks()方法；
 
 ** 至此，项目的主要功能都已经大致完成~接下来就是美化页面和整理代码了~
+
+39 对部分代码进行重构，在部分控制器方法中加强权限判断，同时增加更多的注释等（2020/11/22）：
+
+  - 对Mapper和Service的部分方法进行重命名，使其更加准确；
+
+  - 新增WebHelper工具类；
+
+  - 新增Poster组件，专门负责邮件的发送；
+
+  - 新增ImageController，专门负责图片上传的业务（之前是由UserController和GroupController负责的）；
+

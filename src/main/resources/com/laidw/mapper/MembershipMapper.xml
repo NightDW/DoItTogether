@@ -79,6 +79,7 @@
 
 
     <!-- =============================编写SQL语句============================= -->
+
     <insert id="insertMembership" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO
         <include refid="tableName" />
@@ -86,17 +87,20 @@
         VALUES
         <include refid="insertClassAtts" />
     </insert>
-    <delete id="deleteMembership">
+
+    <delete id="deleteMembershipByUG">
         DELETE FROM
         <include refid="tableName" />
         WHERE user_id = #{uid} AND group_id = #{gid}
     </delete>
+
     <delete id="deleteMembershipsByGroupId">
         DELETE FROM
         <include refid="tableName" />
         WHERE group_id = #{gid}
     </delete>
-    <update id="updateMembershipSelectively">
+
+    <update id="updateMembershipByUGSelectively">
         UPDATE
         <include refid="tableName" />
         <set>
@@ -104,6 +108,7 @@
         </set>
         WHERE user_id = #{userPubInfo.id} AND group_id = #{groupPubInfo.id}
     </update>
+
     <update id="updateMembershipByIdSelectively">
         UPDATE
         <include refid="tableName" />
@@ -112,46 +117,55 @@
         </set>
         <include refid="whereId" />
     </update>
+
     <select id="selectMembershipById" resultMap="fullMap">
         SELECT * FROM
         <include refid="tableName" />
         <include refid="whereId" />
     </select>
+
     <select id="selectMembershipPubInfoById" resultMap="onlyPubInfoMap">
         SELECT * FROM
         <include refid="tableName" />
         <include refid="whereId" />
     </select>
-    <select id="selectMembership" resultMap="fullMap">
+
+    <select id="selectMembershipByUG" resultMap="fullMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE user_id = #{uid} AND group_id = #{gid}
     </select>
-    <select id="selectMembershipPubInfo" resultMap="onlyPubInfoMap">
+
+    <select id="selectMembershipPubInfoByUG" resultMap="onlyPubInfoMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE user_id = #{uid} AND group_id = #{gid}
     </select>
+
     <select id="selectMembershipsByUserId" resultMap="fullMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE user_id = #{uid}
     </select>
+
     <select id="selectMembershipsPubInfoByUserId" resultMap="onlyPubInfoMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE user_id = #{uid}
     </select>
+
     <select id="selectMembershipsByGroupId" resultMap="fullMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE group_id = #{gid}
     </select>
+
     <select id="selectMembershipsPubInfoByGroupId" resultMap="onlyPubInfoMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE group_id = #{gid}
     </select>
+
     <!-- =============================编写SQL语句============================= -->
 
 </mapper>

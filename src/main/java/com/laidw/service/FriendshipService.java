@@ -4,23 +4,29 @@ import com.laidw.entity.Friendship;
 
 import java.util.List;
 
+/**
+ * 主要负责Friendship相关的业务，部分方法的作用可以参考FriendshipMapper
+ */
 public interface FriendshipService {
 
     int insertFriendship(Integer hid, Integer gid, String remarks);
 
-    void requestToBecomeFriends(Integer hid, Integer gid, String msg);
+    /**
+     * 同时插入两条Friendship数据
+     * @param uid1 用户1的id
+     * @param uid2 用户2的id
+     */
+    void insertFriendshipPair(Integer uid1, Integer uid2);
 
-    void agreeToBecomeFriends(Integer hid, Integer gid);
+    void deleteFriendshipPairByHG(Integer hid, Integer gid);
 
-    void deleteFriend(Integer hid, Integer gid);
-
-    int updateFriendshipSelectively(Friendship friendship);
+    int updateFriendshipByHGSelectively(Friendship friendship);
 
     int updateFriendshipByIdSelectively(Friendship friendship);
 
     Friendship selectFriendshipById(Integer id);
 
-    Friendship selectFriendship(Integer hid, Integer gid);
+    Friendship selectFriendshipByHG(Integer hid, Integer gid);
 
     List<Friendship> selectFriendshipsByHostId(Integer hid);
 }

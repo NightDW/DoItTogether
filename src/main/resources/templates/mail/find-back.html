@@ -5,16 +5,16 @@
     <title>Find Back Account Info</title>
 </head>
 <body>
-Here is your account info:<br>
-Username: <span th:text="${user.username}"></span><br>
-Introduction: <span th:text="${user.introduction}"></span><br>
-Password: <span th:text="${user.password}"></span><br>
-Email: <span th:text="${user.email}"></span><br>
-Phone: <span th:text="${user.phone}"></span><br>
-Gender: <span th:text="${user.gender}"></span><br>
-Role: <span th:text="${user.role.name()}"></span><br>
-IsValid: <span th:text="${user.isValid}"></span><br>
-<p th:if="${!user.isValid}">Your account is not valid! Please click <a th:href="${verifyUrl}">this link</a> to validate your account!</p><br>
-For the safety of your account, please delete this email after you find back your account info!<br>
+    Here is your account info on <a th:href="${projectUrl}">DoItTogether Platform</a>:<br>
+    Username: <span th:text="${user.username}"></span><br>
+    Introduction: <span th:text="${user.introduction}"></span><br>
+    Password: <span th:text="${user.password}"></span><br>
+    Email: <span th:text="${user.email}"></span><br>
+    Phone: <span th:text="${user.phone}"></span><br>
+    Gender: <span th:text="${user.gender}"></span><br>
+    Role: <span th:text="${user.role.name()}"></span><br>
+    IsValid: <span th:text="${user.isValid}"></span><br>
+    <p th:if="${!user.isValid}">Your account is not valid! Please click <a th:href="${verifyUrl}">this link</a> to validate your account!</p><br>
+    For the safety of your account, please delete this email after you find back your account info!<br>
 </body>
 </html>

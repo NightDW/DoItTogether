@@ -1,20 +1,19 @@
 package com.laidw.service.impl;
 
 import com.laidw.entity.Friendship;
-import com.laidw.entity.Message;
 import com.laidw.entity.User;
 import com.laidw.mapper.FriendshipMapper;
 import com.laidw.service.FriendshipService;
 import com.laidw.service.MessageService;
-import com.laidw.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 
+/**
+ * FriendshipService的实现类
+ */
 @Service
 @Transactional
 public class FriendshipServiceImpl implements FriendshipService {
@@ -23,13 +22,7 @@ public class FriendshipServiceImpl implements FriendshipService {
     private FriendshipMapper friendshipMapper;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private MessageService messageService;
-
-    @Value("${dit.become-friend-msg}")
-    private String becomeFriendMsg;
 
     public int insertFriendship(Integer hid, Integer gid, String remarks) {
         Friendship friendship = new Friendship();
@@ -41,25 +34,19 @@ public class FriendshipServiceImpl implements FriendshipService {
         return friendshipMapper.insertFriendship(friendship);
     }
 
-    public void requestToBecomeFriends(Integer hid, Integer gid, String msg) {
-        User host = userService.selectUserByCondition(new User(hid), true);
-        messageService.sendSystemMsgTo(gid, msg);
+    public void insertFriendshipPair(Integer uid1, Integer uid2) {
+        insertFriendship(uid1, uid2, null);
+        insertFriendship(uid2, uid1, null);
     }
 
-    public void agreeToBecomeFriends(Integer hid, Integer gid) {
-        insertFriendship(hid, gid, null);
-        insertFriendship(gid, hid, null);
-        messageService.sendMsg(true, hid, gid, becomeFriendMsg);
+    public void deleteFriendshipPairByHG(Integer hid, Integer gid) {
+        messageService.deletePrivateMessagesBetween(hid, gid);
+        friendshipMapper.deleteFriendshipByHG(hid, gid);
+        friendshipMapper.deleteFriendshipByHG(gid, hid);
     }
 
-    public void deleteFriend(Integer hid, Integer gid) {
-        messageService.deleteMessagesBetween(hid, gid);
-        friendshipMapper.deleteFriendship(hid, gid);
-        friendshipMapper.deleteFriendship(gid, hid);
-    }
-
-    public int updateFriendshipSelectively(Friendship friendship) {
-        return friendshipMapper.updateFriendshipSelectively(friendship);
+    public int updateFriendshipByHGSelectively(Friendship friendship) {
+        return friendshipMapper.updateFriendshipByHGSelectively(friendship);
     }
 
     public int updateFriendshipByIdSelectively(Friendship friendship) {
@@ -70,8 +57,8 @@ public class FriendshipServiceImpl implements FriendshipService {
         return friendshipMapper.selectFriendshipById(id);
     }
 
-    public Friendship selectFriendship(Integer hid, Integer gid) {
-        return friendshipMapper.selectFriendship(hid, gid);
+    public Friendship selectFriendshipByHG(Integer hid, Integer gid) {
+        return friendshipMapper.selectFriendshipByHG(hid, gid);
     }
 
     public List<Friendship> selectFriendshipsByHostId(Integer hid) {

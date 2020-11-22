@@ -10,8 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
-import java.util.List;
 
+/**
+ * 测试MessageMapper
+ */
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class MessageMapperTest {
@@ -21,37 +23,42 @@ public class MessageMapperTest {
 
     @Test
     public void insertMessageTest(){
+        User senderUser = new User();
+        Membership senderMem = new Membership();
         Message message = new Message();
-        User user = new User();
-        Membership membership = new Membership();
-        membership.setUserPubInfo(user);
         message.setContent("Hello");
         message.setSendTime(new Date());
+
+        message.setIsPrivate(false);
+        message.setSenderPubInfo(senderMem);
         for(int i = 1; i < 4; i++){
-            message.setIsPrivate(false);
-            message.setSenderPubInfo(membership);
-            user.setId(i);
+            senderMem.setId(i);
             message.setAccId(i);
             messageMapper.insertMessage(message);
         }
-        for(int i = 4; i < 8; i++){
-            message.setIsPrivate(true);
-            message.setSenderPubInfo(user);
-            user.setId(i);
+
+        message.setIsPrivate(true);
+        message.setSenderPubInfo(senderUser);
+        for(int i = 1; i < 6; i++){
+            senderUser.setId(i);
             message.setAccId(i + 1);
             messageMapper.insertMessage(message);
         }
     }
 
     @Test
-    public void deleteMessageByIdTest(){
-        messageMapper.deleteMessageById(7);
+    public void updateMessageTest(){
+        messageMapper.updateGroupMessageSenderId(1, 2, 1);
     }
 
     @Test
-    public void selectMessageTest(){
-        List<Message> list1 = messageMapper.selectMessagesByGroupId(3);
-        List<Message> list2 = messageMapper.selectMessagesBetween(5, 4);
-        list1 = list2 = null;
+    public void deleteMessageTest(){
+        messageMapper.deleteMessageById(1);
+        messageMapper.deleteGroupMessagesByGroupId(2);
+        messageMapper.deletePrivateMessagesBetween(5, 6);
     }
+
+    /*
+     * 查询方法测试比较复杂，因此暂时忽略
+     */
 }

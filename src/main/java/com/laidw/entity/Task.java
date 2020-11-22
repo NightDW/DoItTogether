@@ -1,6 +1,8 @@
 package com.laidw.entity;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
@@ -9,8 +11,9 @@ import java.util.List;
  * 用于存储任务的信息
  */
 @Getter@Setter
-@NoArgsConstructor@AllArgsConstructor
+@NoArgsConstructor
 public class Task {
+
     /**
      * 任务的id
      */
@@ -22,7 +25,7 @@ public class Task {
     private Date pubTime;
 
     /**
-     * 任务的完成时间，可作为判断是否已完成的依据
+     * 任务的完成时间，该字段可作为判断任务是否已完成的依据
      */
     private Date finTime;
 
@@ -48,14 +51,14 @@ public class Task {
     private Integer groupId;
 
     /**
-     * 任务的接收者，只保存其中的非隐私信息
+     * 任务的接收者，只保存其中的非隐私信息，即不含isTop和isShow信息
      */
     private Membership acceptorPubInfo;
 
     /**
-     * 任务的父任务id
-     * 一般查找任务树时都是从根往叶的方向查找的，因此保存父任务的id即可
-     * 不用Task father的另一个原因是防止循环重复查找
+     * 任务的父任务id，如果该字段为空，说明该任务是根任务
+     * 查询到根任务后，取出其id，然后根据fatherId = id条件继续查找叶子任务
+     * 这里不能用Task father字段表示父任务，避免循环重复查找
      */
     private Integer fatherId;
 
@@ -74,14 +77,22 @@ public class Task {
      * @return 该任务的完成进度
      */
     public double getProgress(){
+
+        //如果本身是叶子任务，则进度只可以是0或100%
         if(!hasSon)
             return finTime == null ? 0 : 1;
+
+        //如果不是叶子任务，那么其所有子任务的平均进度即为该任务的进度
         double count = 0;
         for(Task son: sons)
             count += son.getProgress();
         return count / sons.size();
     }
 
+    /**
+     * 获取该任务的状态
+     * @return 该任务的状态
+     */
     public String getStatus(){
         if(hasSon)
             return getProgress() == 1.0 ? "Sons done" : "Sons doing";
@@ -89,9 +100,15 @@ public class Task {
             return "Done";
         if(acceptorPubInfo != null)
             return "Doing";
+
+        //Waiting表示该任务正等待被接收
         return "Waiting";
     }
 
+    /**
+     * 获取该任务的状态颜色，红色表示已完成，绿色表示进行中，蓝色表示未开始
+     * @return 该任务的状态颜色
+     */
     public String getStatusColor(){
         if(hasSon)
             return getProgress() == 1.0 ? "red" : "green";

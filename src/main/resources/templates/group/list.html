@@ -26,9 +26,13 @@
 <div class="groups">
     <div th:each="membership : ${memberships}" class="group">
         <div class="media panel panel-default">
+
+            <!-- 显示群组的头像 -->
             <div class="media-left media-middle">
                 <img class="icon" th:src="@{/img/} + ${membership.groupPubInfo.iconUrl}" />
             </div>
+
+            <!-- 显示群组的名字，本用户在该群的角色等信息 -->
             <div class="media-body">
                 <h3>
                     <a th:href="@{/group/} + ${membership.groupPubInfo.id}" th:text="${membership.groupPubInfo.name}"></a>
@@ -48,6 +52,7 @@
                     <a th:href="@{/membership/view/} + ${membership.id} + ${membership.isShow ? '/00' : '/01'} "><span th:class="'glyphicon glyphicon-eye-' + ${membership.isShow ? 'open' : 'close'}"></span></a>
                 </span>
             </div>
+
         </div>
     </div>
 </div>
@@ -62,13 +67,16 @@
 <!-- 引入常用的函数 -->
 <script th:replace="fragments::usefulFunctions"></script>
 
+<!-- 本页面特有的一些JS代码 -->
 <script>
+
+    //通过AJAX发送修改备注的请求
     function setNickname(obj) {
         var mid = $(obj).attr("mid");
-        var nicknameStr = $(obj).val();
+        var nickname = $(obj).val();
         $.ajax({
             url: "/membership/nickname/" + mid,
-            data: {nickname: nicknameStr},
+            data: {nickname: nickname},
             success:function(result){
                 $("#top-msg").text(!isEmptyStr(result) && result === "OK" ? 'Changed nickname successfully!': 'Failed to change nickname!');
             }

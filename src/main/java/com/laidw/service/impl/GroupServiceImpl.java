@@ -1,7 +1,6 @@
 package com.laidw.service.impl;
 
 import com.laidw.entity.Group;
-import com.laidw.entity.Membership;
 import com.laidw.entity.User;
 import com.laidw.entity.common.Role;
 import com.laidw.mapper.GroupMapper;
@@ -16,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * GroupService的实现类
+ */
 @Service
 @Transactional
 public class GroupServiceImpl implements GroupService {
@@ -38,22 +40,28 @@ public class GroupServiceImpl implements GroupService {
     @Value("${dit.system-user.nickname}")
     private String nickname;
 
-    @Value("${dit.default-group-img}")
+    @Value("${dit.img.default-img.group}")
     private String groupImg;
 
-    //群建立后，创建者自动加入该群，同时系统用户也悄悄加入
+
     public void foundGroup(Integer founderId, Group group) {
+
+        //设置群组的默认头像
         if(group.getIconUrl() == null)
             group.setIconUrl(groupImg);
+
+        //插入群组数据
         groupMapper.insertGroup(group);
+
+        //创建者和系统用户加入群组，系统用户用于代表已经退群的用户
+        //joinGroup()方法在将Membership插入数据库的同时会发送一条提示消息
         membershipService.joinGroup(founderId, group.getId(), Role.FOUNDER, null);
-        //昵称如果硬编码到这里会有乱码
-        membershipService.insertMembership(systemUser.getId(), group.getId(), Role.NORMAL, nickname);
+        membershipService.insertMembershipReturnId(systemUser.getId(), group.getId(), Role.NORMAL, nickname);
     }
 
     public void deleteGroupById(Integer id) {
-        taskService.deleteTasksByGroupId(id);
-        messageService.deleteMessagesByGroupId(id);
+        taskService.deleteAllTasksByGroupId(id);
+        messageService.deleteGroupMessagesByGroupId(id);
         membershipService.deleteMembershipsByGroupId(id);
         groupMapper.deleteGroupById(id);
     }

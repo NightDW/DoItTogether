@@ -8,6 +8,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+/**
+ * UserDetailsService的实现类，SpringSecurity通过该类来验证是否登录成功
+ */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 

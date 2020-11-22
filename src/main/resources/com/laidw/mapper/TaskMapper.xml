@@ -18,7 +18,6 @@
 
     <!-- 插入表时涉及的类的属性 -->
     <sql id="insertClassAtts">
-        <!-- (#{pubTime}, #{finTime}, #{title}, #{content}, #{result}, #{groupId}, #{acceptorPubInfo.userPubInfo.id}, #{fatherId}, #{hasSon}) -->
         (#{pubTime}, #{finTime}, #{title}, #{content}, #{result}, #{groupId}, #{acceptorPubInfo.id}, #{acceptorPubInfo.userPubInfo.id}, #{fatherId}, #{hasSon})
     </sql>
 
@@ -78,7 +77,8 @@
 
     <!-- =============================定义封装规则============================= -->
 
-    <resultMap id="baseMap" type="com.laidw.entity.Task">
+    <!-- 只查询出本条记录，不再查询它的子任务 -->
+    <resultMap id="recordMap" type="com.laidw.entity.Task">
         <id column="id" property="id" />
         <result column="pub_time" property="pubTime" />
         <result column="fin_time" property="finTime" />
@@ -88,19 +88,21 @@
         <result column="group_id" property="groupId" />
         <result column="has_son" property="hasSon" />
         <result column="father_id" property="fatherId" />
-    </resultMap>
-
-    <resultMap id="taskMap" type="com.laidw.entity.Task" extends="baseMap">
         <association property="acceptorPubInfo" column="acc_id"
                      select="com.laidw.mapper.MembershipMapper.selectMembershipPubInfoById" />
+    </resultMap>
+
+    <!-- 完整的映射，会查询出子任务 -->
+    <resultMap id="taskMap" type="com.laidw.entity.Task" extends="recordMap">
         <collection property="sons" column="id"
-                    select="com.laidw.mapper.TaskMapper.selectTasksByFatherId" />
+                    select="com.laidw.mapper.TaskMapper.selectFullTasksByFatherId" />
     </resultMap>
 
     <!-- =============================定义封装规则============================= -->
 
 
     <!-- =============================编写SQL语句============================= -->
+
     <insert id="insertTask" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO
         <include refid="tableName" />
@@ -108,21 +110,32 @@
         VALUES
         <include refid="insertClassAtts" />
     </insert>
-    <delete id="deleteTaskRecordById">
-        DELETE FROM
-        <include refid="tableName" />
-        <include refid="whereId" />
-    </delete>
-    <delete id="deleteTaskRecordsByGroupId">
-        DELETE FROM
-        <include refid="tableName" />
-        WHERE group_id = #{gid}
-    </delete>
-    <delete id="deleteTaskRecordsByFatherId">
+
+    <delete id="deleteTasksByFatherId">
         DELETE FROM
         <include refid="tableName" />
         WHERE father_id = #{id}
     </delete>
+
+    <delete id="deleteTaskById">
+        DELETE FROM
+        <include refid="tableName" />
+        <include refid="whereId" />
+    </delete>
+
+    <update id="clearTasksFatherIdInThisGroup">
+        UPDATE
+        <include refid="tableName" />
+        SET father_id = NULL
+        WHERE group_id = #{gid}
+    </update>
+
+    <delete id="deleteTasksByGroupId">
+        DELETE FROM
+        <include refid="tableName" />
+        WHERE group_id = #{gid}
+    </delete>
+
     <update id="updateTaskByIdSelectively">
         UPDATE
         <include refid="tableName" />
@@ -131,55 +144,64 @@
         </set>
         <include refid="whereId" />
     </update>
-    <update id="clearTaskAcceptorById">
+
+    <update id="clearUnfinishedTaskAcceptorById">
         UPDATE
         <include refid="tableName" />
         SET acc_id = NULL, acc_user_id = NULL
-        <include refid="whereId" />
+        <include refid="whereId" /> AND fin_time IS NULL
     </update>
-    <update id="clearUnfinishedTasksAcceptor">
+
+    <update id="giveUpMyUnfinishedTasksInThisGroup">
         UPDATE
         <include refid="tableName" />
         SET acc_id = NULL, acc_user_id = NULL
         WHERE acc_id = #{mid} AND group_id = #{gid} AND fin_time IS NULL
     </update>
-    <update id="updateFinishedTaskAccIdInThisGroup">
+
+    <update id="transferFinishedTaskAccIdInThisGroup">
         UPDATE
         <include refid="tableName" />
         SET acc_id = #{nmid}, acc_user_id = #{nuid}
         WHERE acc_id = #{omid} AND group_id = #{gid} AND fin_time IS NOT NULL
     </update>
-    <update id="clearTasksFatherIdInThisGroup">
-        UPDATE
-        <include refid="tableName" />
-        SET father_id = NULL
-        WHERE group_id = #{gid}
-    </update>
-    <select id="selectTaskById" resultMap="taskMap">
+
+    <select id="selectFullTaskById" resultMap="taskMap">
         SELECT * FROM
         <include refid="tableName" />
         <include refid="whereId" />
     </select>
-    <select id="selectTaskBaseInfoById" resultMap="baseMap">
+
+    <select id="selectTaskById" resultMap="recordMap">
         SELECT * FROM
         <include refid="tableName" />
         <include refid="whereId" />
     </select>
-    <select id="selectTasksByFatherId" resultMap="taskMap">
+
+    <select id="selectFullTasksByFatherId" resultMap="taskMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE father_id = #{tid}
     </select>
-    <select id="selectTasksByAccUserId" resultMap="taskMap">
+
+    <select id="selectTasksByFatherId" resultMap="recordMap">
+        SELECT * FROM
+        <include refid="tableName" />
+        WHERE father_id = #{tid}
+    </select>
+
+    <select id="selectTasksByAccUserId" resultMap="recordMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE acc_user_id = #{uid}
     </select>
-    <select id="selectRootTasksByGroupId" resultMap="taskMap">
+
+    <select id="selectRootFullTasksByGroupId" resultMap="taskMap">
         SELECT * FROM
         <include refid="tableName" />
-        WHERE group_id = #{gid} AND ISNULL(father_id)
+        WHERE group_id = #{gid} AND father_id IS NULL
     </select>
+
     <!-- =============================编写SQL语句============================= -->
 
 </mapper>

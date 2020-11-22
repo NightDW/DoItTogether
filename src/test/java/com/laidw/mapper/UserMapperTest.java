@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+/**
+ * 测试UserMapper
+ */
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class UserMapperTest {
@@ -18,17 +21,17 @@ public class UserMapperTest {
     @Test
     public void insertUserTest(){
         User user = new User();
-        String username = "laidw";
         user.setPassword("password");
+        user.setIntroduction("introduction");
         user.setIconUrl("icon_url");
-        user.setGender(true);
         user.setRole(Role.ADMIN);
-        user.setIsValid(true);
         user.setVerifyCode("verify_code");
-        for(int i = 0; i < 10; i++){
-            user.setUsername(username + i);
-            user.setEmail(username + i + "@qq.com");
-            user.setPhone("" + i + i + i + i + i);
+        for(int i = 1; i < 10; i++){
+            user.setGender(i % 2 == 1);
+            user.setIsValid(i % 2 == 1);
+            user.setUsername("user" + i);
+            user.setEmail("user" + i + "@qq.com");
+            user.setPhone("" + i * 1000000);
             userMapper.insertUser(user);
         }
     }
@@ -36,45 +39,33 @@ public class UserMapperTest {
     @Test
     public void updateUserByIdTest(){
         User user = new User();
-        user.setId(10);
-        user.setUsername("n_laidw");
-        user.setPassword("n_password");
-        user.setEmail("n_email");
-        user.setPhone("n_phone");
+
+        //先测试有选择性的更新操作
+        user.setId(9);
+        user.setRole(Role.NORMAL);
+        user.setEmail("new_email");
+        userMapper.updateUserByIdSelectively(user);
+
+        //再测试完全更新操作
+        user.setId(8);
+        user.setUsername("night");
+        user.setPassword("12345678");
+        user.setEmail("123@123.com");
+        user.setPhone("12345678");
         user.setGender(false);
         user.setRole(Role.FOUNDER);
         user.setIsValid(false);
-        user.setVerifyCode("n_verify_code");
+        user.setVerifyCode("12345678");
         userMapper.updateUserById(user);
-    }
-
-    @Test
-    public void updateUserByIdSelectivelyTest(){
-        User user = new User();
-        user.setId(9);
-        user.setRole(Role.NORMAL);
-        userMapper.updateUserByIdSelectively(user);
     }
 
     @Test
     public void deleteUserByIdTest(){
         userMapper.deleteUserById(9);
-        userMapper.deleteUserById(10);
+        userMapper.deleteUserById(8);
     }
 
-    @Test
-    public void selectUserTest(){
-        User demo = new User();
-
-        demo.setEmail("laidw0@qq.com");
-        User user1 = userMapper.selectUserByCondition(demo);
-
-        demo.setUsername("laidw1");
-        User user2 = userMapper.selectUserPubInfoByCondition(demo);
-
-        demo.setId(4);
-        User user4 = userMapper.selectUserByCondition(demo);
-
-        userMapper.selectAllUsers();
-    }
+    /*
+     * 查询方法测试比较复杂，因此暂时忽略
+     */
 }

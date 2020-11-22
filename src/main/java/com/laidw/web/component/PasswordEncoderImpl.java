@@ -1,10 +1,10 @@
-package com.laidw.web.plugin.impl;
+package com.laidw.web.component;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * 高版本的SpringSecurity要求我们提供密码解析器，简单实现一个即可
+ * 高版本的SpringSecurity要求我们提供一个密码解析器，我们简单实现一个即可
  */
 @Component
 public class PasswordEncoderImpl implements PasswordEncoder {

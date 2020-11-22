@@ -10,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-
+/**
+ * 测试MembershipMapper
+ */
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class MembershipMapperTest {
@@ -26,11 +27,12 @@ public class MembershipMapperTest {
         Group group = new Group();
         membership.setUserPubInfo(user);
         membership.setGroupPubInfo(group);
+
         membership.setRole(Role.ADMIN);
         membership.setIsMute(false);
         membership.setIsShow(true);
         membership.setIsTop(false);
-        for(int i = 1; i < 9; i++){
+        for(int i = 1; i < 8; i++){
             user.setId(i);
             group.setId(i);
             membership.setNickname("nickname" + i);
@@ -39,28 +41,27 @@ public class MembershipMapperTest {
     }
 
     @Test
-    public void updateMembershipSelectivelyTest(){
+    public void updateMembershipTest(){
         Membership membership = new Membership();
-        membership.setUserPubInfo(new User(8));
-        membership.setGroupPubInfo(new Group(8));
+        membership.setUserPubInfo(new User(7));
+        membership.setGroupPubInfo(new Group(7));
         membership.setRole(Role.FOUNDER);
-        membership.setNickname("n_nickname");
-        membershipMapper.updateMembershipSelectively(membership);
+        membership.setNickname("boss");
+        membershipMapper.updateMembershipByUGSelectively(membership);
+
+        membership.setId(6);
+        membership.setUserPubInfo(null);
+        membership.setGroupPubInfo(null);
+        membershipMapper.updateMembershipByIdSelectively(membership);
     }
 
     @Test
     public void deleteMembershipTest(){
-        membershipMapper.deleteMembership(8, 8);
+        membershipMapper.deleteMembershipByUG(7, 7);
+        membershipMapper.deleteMembershipsByGroupId(6);
     }
 
-    @Test
-    public void selectMembershipTest(){
-        Membership m1 = membershipMapper.selectMembership(1, 1);
-        Membership m2 = membershipMapper.selectMembershipPubInfo(2, 2);
-        List<Membership> list1 = membershipMapper.selectMembershipsByUserId(3);
-        List<Membership> list2 = membershipMapper.selectMembershipsPubInfoByUserId(4);
-        List<Membership> list3 = membershipMapper.selectMembershipsByGroupId(5);
-        List<Membership> list4 = membershipMapper.selectMembershipsPubInfoByGroupId(6);
-        m1 = m2 = null;
-    }
+    /*
+     * 查询方法测试比较复杂，因此暂时忽略
+     */
 }

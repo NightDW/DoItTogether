@@ -1,4 +1,9 @@
+#配置文件中出现了中文，所以更建议使用yml配置文件；如果是properties文件，则需要：
+#在IDEA中把properties配置文件的编码改为utf8，并勾选native-to-ascii conversion
+
+#Spring的基本配置
 spring:
+
   #配置Druid连接池，高版本的SpringBoot的连接驱动发生了改变，且自动执行SQL文件时需要额外的配置
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
@@ -10,19 +15,22 @@ spring:
     schema-username: root
     schema-password: 1234
     initialization-mode: always
+
   #Thymeleaf配置，主要是关闭缓存
   thymeleaf:
     cache: false
+
   #邮件模块用于发送邮件的邮箱及其相关配置
   mail:
-    host: {email-host-name}
-    username: {your-email-username}
-    password: {your-email-password}
+    host: smtp.163.com
+    username: 13719217231@163.com
+    password: wyysysushen6601
     properties:
       mail.smtp.ssl.enable: true
       mail.smtp.auth: true
       smtp.starttls.enable: true
       smtp.starttls.required: true
+
 
 #MyBatis配置，注意关闭自动映射，防止查询公开信息时自动把非公开信息也映射了
 mybatis:
@@ -31,30 +39,43 @@ mybatis:
     auto-mapping-behavior: none
     #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
+
 #自定义的属性
 dit:
-  #用于指定项目不打成Jar包时上传的头像的相对存储路径，参考路径为本项目所在目录，最好以"/"结尾
-  upload-img-relative-dir-no-jar: /DoItTogether/src/main/resources/static/img/
 
-  #用于指定项目打成Jar包时上传的头像的相对存储路径，参考路径为Jar包所在目录，最好以"/"结尾
-  #另外如果是打包成Jar包，则要手动创建目录，并把默认图片复制进去
-  upload-img-relative-dir-is-jar: /DoItTogetherUploadImg/
+  #图片相关的属性
+  img:
 
-  #指定默认的头像名称
-  default-user-img: user/default.png
-  default-group-img: group/default.jpg
+    #上传图片的保存路径，参考路径为本工程/本Jar包所在的目录，注意目录最后不要忘记加上'/'字符
+    #如果不打包成Jar包，那么直接保存在本工程的静态目录中的img目录即可
+    #如果打包成Jar包，那么应该在该Jar包所在目录新创建一个目录来保存图片，此时需手动创建该目录，并把默认图片复制进去
+    upload-relative-dir:
+      no-jar: /DoItTogether/src/main/resources/static/img/
+      is-jar: /DoItTogetherUploadImg/
 
-  #一些默认的消息模板
-  request-friend-msg: 用户#user请求添加您为好友，TA提供的认证信息为：#remarks。#link。
-  become-friend-msg: 我们已经是好友啦，可以开始聊天了~
-  join-in-group-msg: 大家好，请多多指教~
+    #新创建的用户/群组的默认头像的url
+    default-img:
+      user: user/default.png
+      group: group/default.jpg
+
+  #自定义的一些消息
+  msg:
+
+    #用户请求添加另一个用户为好友时，系统向后者发送的消息模板
+    request-friend: 用户#user请求添加您为好友，TA提供的认证信息为：#remarks。#link。
+
+    #用户同意另一个用户的好友申请时，向后者发送的消息
+    become-friend: 我们已经是好友啦，可以开始聊天了~
+
+    #用户加入群组时在群组中发送的消息
+    join-in-group: 大家好，请多多指教~
+
 
   #系统通知小助手的各个属性（其它用户在注册时将自动添加系统通知小助手为好友）
-  #这里出现了中文，所以建议使用yml配置文件；如果是properties文件，则需要：
-  #在IDEA中把properties配置文件的编码改为utf8，并勾选native-to-ascii conversion
   system-user:
     username: DIT小助手
     password: 23333333333
+    introduction: A system user for sending system message
     icon-url: user/assistant.jpg
     email: assistant@dit.com
     phone: 23333333333

@@ -5,10 +5,12 @@ import com.laidw.entity.common.Role;
 
 import java.util.List;
 
+/**
+ * 主要负责Membership相关的业务，部分方法的作用可以参考MembershipMapper
+ */
 public interface MembershipService {
 
-    //这里的返回值为插入的Membership的id值
-    int insertMembership(Integer uid, Integer gid, Role role, String nickname);
+    int insertMembershipReturnId(Integer uid, Integer gid, Role role, String nickname);
 
     int deleteMembershipsByGroupId(Integer gid);
 
@@ -16,11 +18,13 @@ public interface MembershipService {
 
     void leaveGroup(Integer uid, Integer gid);
 
-    int updateMembershipSelectively(Membership membership);
+    int updateMembershipByUGSelectively(Membership membership);
 
     int updateMembershipByIdSelectively(Membership membership);
 
-    Membership selectMembership(Integer uid, Integer gid, Boolean onlyPubInfo);
+    Membership selectMembershipByUG(Integer uid, Integer gid, Boolean onlyPubInfo);
+
+    Membership selectMembershipById(Integer mid, Boolean onlyPubInfo);
 
     List<Membership> selectMembershipsByUserId(Integer uid, Boolean onlyPubInfo);
 

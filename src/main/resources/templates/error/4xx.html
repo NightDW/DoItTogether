@@ -3,15 +3,27 @@
 <!-- 引入th标签和sec标签 -->
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
+<!--
+ * DefaultErrorAttributes类默认会向错误页面传递如下参数：
+ * <li>timestamp - The time that the errors were extracted</li>
+ * <li>status - The status code</li>
+ * <li>error - The error reason</li>
+ * <li>exception - The class name of the root exception (if configured)</li>
+ * <li>message - The exception message</li>
+ * <li>errors - Any {@link ObjectError}s from a {@link BindingResult} exception
+ * <li>trace - The exception stack trace</li>
+ * <li>path - The URL path when the exception was raised</li>
+-->
+
 <head>
     <meta charset="UTF-8">
-    <title>Change Icon</title>
+    <title th:text="${status + ' ' + error}">Error</title>
 
     <!-- 引入fragments.css文件 -->
     <link th:replace="fragments::fragmentsCSS" />
 
     <!-- 引入本页面对应的css文件 -->
-    <link th:href="@{/css/base/icon.css}" rel="stylesheet">
+    <link th:href="@{/css/error/4xx.css}" rel="stylesheet">
 
     <!-- 引入片段中的Bootstrap -->
     <link th:replace="fragments::bootstrap" />
@@ -23,19 +35,10 @@
 <div th:replace="fragments::nevigate"></div>
 
 <!-- 在此添加页面主体信息 -->
-<div class="container">
-
-    <!-- 注意，本表单可以同时用于上传用户头像和上传群组头像，具体通过action属性来区分，因此要求Controller传来url参数 -->
-    <form class="form-inline" th:action="@{/} + ${url}" method="post" enctype="multipart/form-data">
-        <h2 class="form-signin-heading">Please upload</h2>
-        <p class="msg">Better to choose an square-shape image!</p>
-        <p class="msg">Your image should not be to large!</p>
-
-        <input class="form-control" type="file" name="icon" accept="image/*">
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Upload</button>
-    </form>
-
-</div>
+<h3 class="notice" th:text="${'StatusCode: ' + status + ' ' + error}"></h3>
+<h3 class="notice" th:text="${'Path: ' + path}"></h3>
+<h3 class="notice" th:text="${'Time: ' + timestamp}"></h3>
+<h3 class="notice" th:text="${'Message: ' + message}"></h3>
 
 <!-- 引入底部信息 -->
 <div th:replace="fragments::footer"></div>

@@ -5,6 +5,8 @@
 
 <head>
     <meta charset="UTF-8">
+
+    <!-- 本页面可以同时作为创建群组页面和修改群组信息页面，可通过是否有GroupId来确定是哪种情况 -->
     <title th:text="${group == null || group.id == null} ? 'Create Group' : 'Modify Group'"></title>
 
     <!-- 引入fragments.css文件 -->

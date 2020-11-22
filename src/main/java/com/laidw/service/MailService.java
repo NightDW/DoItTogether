@@ -7,6 +7,7 @@ import java.util.Map;
  * 该Service负责发送邮件
  */
 public interface MailService {
+
     /**
      * 发送简单的邮件
      * @param sendTo 收件人

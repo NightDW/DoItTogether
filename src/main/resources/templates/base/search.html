@@ -23,13 +23,17 @@
 <div th:replace="fragments::nevigate"></div>
 
 <!-- 在此添加页面主体信息 -->
-<div class="users">
+<div class="users"><!-- 搜索到的所有用户信息 -->
     <h2>Users</h2>
     <p class="msg">Click the star symbol to request to be friends!</p>
     <div th:class="'media panel panel-default ' + ${user.gender ? 'man-user' : 'woman-user'}" th:if="${user.isValid}" th:each="user : ${users}">
+
+        <!-- 显示头像 -->
         <div class="media-left media-middle">
             <img class="icon" th:src="@{/img/} + ${user.iconUrl}" />
         </div>
+
+        <!-- 显示用户信息和添加好友按钮 -->
         <div class="media-body">
             <div>
                 <span class="glyphicon glyphicon-user"></span>
@@ -41,16 +45,20 @@
                 <span th:text="${user.introduction}"></span>
             </div>
         </div>
+
     </div>
 </div>
-
-<div class="groups">
+<div class="groups"><!-- 搜索到的所有群组信息 -->
     <h2>Groups</h2>
     <p class="msg">Click the login symbol to join in that task group!</p>
     <div class="media panel panel-default" th:each="group : ${groups}">
+
+        <!-- 显示头像 -->
         <div class="media-left media-middle">
             <img class="icon" th:src="@{/img/} + ${group.iconUrl}" />
         </div>
+
+        <!-- 显示群组信息和加入群组按钮 -->
         <div class="media-body">
             <div>
                 <span class="glyphicon glyphicon-tasks"></span>
@@ -62,6 +70,7 @@
                 <span th:text="${group.slogan}"></span>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -75,24 +84,32 @@
 <!-- 引入常用的函数 -->
 <script th:replace="fragments::usefulFunctions"></script>
 
+<!-- 本页面特有的一些JS代码 -->
 <script>
+
+    //用户点击申请好友的按钮时触发该函数
     function applyButFunction(obj) {
         var remarks = prompt("Please tell him/her who you are:");
-        if(remarks === null)
+        if(isEmptyStr(remarks)){
+            alert("Quit!");
             return;
+        }
+
+        //发送AJAX请求
         var gid = $(obj).attr("gid");
         var data = {remarks: remarks};
         $.ajax({
             url: "/friend/request/" + gid,
             data: data,
-            success:function(result){
+            success: function(result){
                 var topMsg = $("#top-msg");
-                if(isEmptyStr(result))
+                if(isEmptyStr(result)) {
                     topMsg.text("Error occurred!");
-                else if(result === "OK")
+                } else if(result === "OK") {
                     topMsg.text("Sent request successfully!");
-                else
+                } else{
                     topMsg.text("You had been friends!");
+                }
             }
         });
     }

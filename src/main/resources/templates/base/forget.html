@@ -61,12 +61,14 @@
 <!-- 引入常用的函数 -->
 <script th:replace="fragments::usefulFunctions"></script>
 
+<!-- 本页面特有的JS -->
 <script>
     function findBackButClick() {
-        if(isEmptyStr($("#username").val()) && isEmptyStr($("#email").val()) && isEmptyStr($("#phone").val()))
+        if(isEmptyStr($("#username").val()) && isEmptyStr($("#email").val()) && isEmptyStr($("#phone").val())){
             alert("You must provide at least one of your info!");
-        else
+        } else{
             $("#findBackForm").submit();
+        }
     }
 </script>
 

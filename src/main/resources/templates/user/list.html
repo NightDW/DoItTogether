@@ -23,41 +23,24 @@
 <div th:replace="fragments::nevigate"></div>
 
 <!-- 在此添加页面主体信息 -->
-<!--<div class="users">-->
-    <!--<div th:each="friendship : ${friendships}" class="user">-->
-        <!--<div class="media panel panel-default">-->
-            <!--<div class="media-left media-middle">-->
-                <!--<img class="icon" th:src="@{/img/} + ${friendship.guestPubInfo.iconUrl}" />-->
-            <!--</div>-->
-            <!--<div class="media-body">-->
-                <!--<h3>-->
-                    <!--<a th:href="@{/friend/} + ${friendship.id}" th:text="${friendship.guestPubInfo.username}"></a>-->
-                <!--</h3>-->
-                <!--<p>-->
-                    <!--<span>The remarks you set about him/her: </span>-->
-                    <!--<input th:value="${friendship.remarks}" placeholder="Set remarks" onblur="setRemarks(this)" th:attr="fid=${friendship.id}" />-->
-                <!--</p>-->
-                <!--<span class="glyphicons">-->
-                    <!--<a th:href="@{/friend/view/} + ${friendship.id} + ${friendship.isTop ? '/10' : '/11'} "><span th:class="'glyphicon glyphicon-star' + ${friendship.isTop ? '' : '-empty'}"></span></a>-->
-                    <!--<a th:href="@{/friend/view/} + ${friendship.id} + ${friendship.isShow ? '/00' : '/01'} "><span th:class="'glyphicon glyphicon-eye-' + ${friendship.isShow ? 'open' : 'close'}"></span></a>-->
-                <!--</span>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-<!--</div>-->
-
 <div class="main">
+
+    <!-- 显示在左边的标签页导航条，用于显示好友信息 -->
     <ul id="myTabs" class="nav nav-pills nav-stacked" role="tablist">
         <li th:each="friendship : ${friendships}" role="presentation">
             <div class="media panel panel-default">
+
+                <!-- 好友头像 -->
                 <div class="media-left media-middle">
                     <a th:href="'#user' + ${friendship.guestPubInfo.id}" role="tab" data-toggle="tab">
                         <img class="icon" th:src="@{/img/} + ${friendship.guestPubInfo.iconUrl}" />
                     </a>
                 </div>
+
+                <!-- 好友的信息 -->
                 <div class="media-body">
                     <h4>
-                        <a th:href="@{/friend/} + ${friendship.id}" th:text="${friendship.guestPubInfo.username}"></a>
+                        <a target="_blank" th:href="@{/friend/} + ${friendship.id}" th:text="${friendship.guestPubInfo.username}"></a>
                         <span class="glyphicons">
                             <a th:href="@{/friend/view/} + ${friendship.id} + ${friendship.isTop ? '/10' : '/11'} "><span th:class="'glyphicon glyphicon-star' + ${friendship.isTop ? '' : '-empty'}"></span></a>
                             <a th:href="@{/friend/view/} + ${friendship.id} + ${friendship.isShow ? '/00' : '/01'} "><span th:class="'glyphicon glyphicon-eye-' + ${friendship.isShow ? 'open' : 'close'}"></span></a>
@@ -65,15 +48,18 @@
                     </h4>
                     <input th:value="${friendship.remarks}" placeholder="Set remarks" onblur="setRemarks(this)" th:attr="fid=${friendship.id}" />
                 </div>
+
             </div>
         </li>
     </ul>
 
+    <!-- 显示在右边的与好友的私聊页面，如果有如果该好友的用户id正好等于activeUserId，则直接将该私聊页面设为active -->
     <div class="tab-content">
-        <div th:each="friendship : ${friendships}" th:id="'user' + ${friendship.guestPubInfo.id}" role="tabpanel" class="tab-pane">
+        <div th:each="friendship : ${friendships}" th:id="'user' + ${friendship.guestPubInfo.id}" role="tabpanel" th:class="'tab-pane' + ${activeUserId != null && activeUserId == friendship.guestPubInfo.id ? ' active' : ''}">
             <iframe th:src="@{/friend/frame/} + ${friendship.id}"></iframe>
         </div>
     </div>
+
 </div>
 
 <!-- 引入底部信息 -->
@@ -86,6 +72,7 @@
 <!-- 引入常用的函数 -->
 <script th:replace="fragments::usefulFunctions"></script>
 
+<!-- 使用AJAX修改好友备注 -->
 <script>
     function setRemarks(obj) {
         var fid = $(obj).attr("fid");
@@ -93,14 +80,12 @@
         $.ajax({
             url: "/friend/remarks/" + fid,
             data: {remarks: remarksStr},
-            success:function(result){
+            success: function(result){
                 $("#top-msg").text(!isEmptyStr(result) && result === "OK" ? 'Changed remarks successfully!': 'Failed to change remarks!');
             }
         });
     }
 </script>
-
-
 
 </body>
 </html>

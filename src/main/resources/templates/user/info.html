@@ -88,7 +88,7 @@
 <!-- 引入常用的函数 -->
 <script th:replace="fragments::usefulFunctions"></script>
 
-<!-- 判断用户输入是否合法 -->
+<!-- 提交前判断用户输入是否合法 -->
 <script>
     $("#submit-btn").click(function () {
         var username = $("#username").val();
@@ -97,27 +97,30 @@
         var email = $("#email").val();
         var phone = $("#phone").val();
         var gender = $('input[name="gender"]:checked').val();
-        if(isEmptyStr(username) || isEmptyStr(password) || isEmptyStr(confirm) || isEmptyStr(email) || isEmptyStr(phone) || isEmptyStr(gender))
+        if(isEmptyStr(username) || isEmptyStr(password) || isEmptyStr(confirm) || isEmptyStr(email) || isEmptyStr(phone) || isEmptyStr(gender)){
             alert("Information not completed!");
-        else if(password !== confirm)
+        } else if(password !== confirm){
             alert("Two password are not the same!");
-        else
+        } else{
             $("#form").submit();
+        }
     })
 </script>
 
 <!-- 使用AJAX判断信息是否被注册 -->
 <script>
     function blurFunction(input){
+
         //如果是注册，则id为空字符串，如果是修改，则需要告知服务器当前用户的id
         var id = "[[${title} eq 'Register' ? '' : ${user.id}]]";
+
         var attName = $(input).attr("name");
         var attValue = $(input).val();
         var data = {condition : attName + '_' + attValue, id: id};
         $.ajax({
             url: "/check",
             data: data,
-            success:function(result){
+            success: function(result){
                 var tarLabel = $("label[for='" + attName + "']");
                 var text = isEmptyStr(result) ? firstCharToBig(attName) + ': ' : "Duplicated! ";
                 var color = isEmptyStr(result) ? 'black' : 'red';
@@ -126,6 +129,7 @@
             }
         });
     }
+
     //页面加载完成后给3个输入框添加监听事件，并立刻调用一次
     $(function () {
         var username = $("#username");

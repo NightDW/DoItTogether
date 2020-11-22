@@ -5,10 +5,10 @@ import lombok.*;
 import java.util.List;
 
 /**
- * 用于保存任务群组信息
+ * 用于保存任务群组的信息
  */
 @Getter@Setter
-@NoArgsConstructor@AllArgsConstructor
+@NoArgsConstructor
 public class Group {
 
     /**

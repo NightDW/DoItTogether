@@ -8,8 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-
+/**
+ * 测试FriendshipMapper
+ */
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class FriendshipMapperTest {
@@ -22,35 +23,40 @@ public class FriendshipMapperTest {
         Friendship friendship = new Friendship();
         User user = new User();
         friendship.setGuestPubInfo(user);
+
         friendship.setIsShow(true);
         friendship.setIsTop(false);
+        friendship.setRemarks("Guest is host's friend");
         for(int i = 1; i < 7; i++){
             friendship.setHostId(i);
             user.setId(i + 1);
-            friendship.setRemarks(i + 1 + " is " + i + "'s friend");
             friendshipMapper.insertFriendship(friendship);
         }
     }
 
     @Test
-    public void updateFriendshipSelectivelyTest(){
+    public void updateFriendshipTest(){
         Friendship friendship = new Friendship();
         friendship.setHostId(6);
         friendship.setGuestPubInfo(new User(7));
         friendship.setIsTop(true);
         friendship.setRemarks("n_remarks");
-        friendshipMapper.updateFriendshipSelectively(friendship);
+        friendshipMapper.updateFriendshipByHGSelectively(friendship);
+
+        friendship.setId(5);
+        friendship.setHostId(null);
+        friendship.setGuestPubInfo(null);
+        friendship.setIsTop(true);
+        friendship.setRemarks("n_remarks");
+        friendshipMapper.updateFriendshipByIdSelectively(friendship);
     }
 
     @Test
-    public void deleteFriendshipTest(){
-        friendshipMapper.deleteFriendship(6, 7);
+    public void deleteFriendshipByHGTest(){
+        friendshipMapper.deleteFriendshipByHG(6, 7);
     }
 
-    @Test
-    public void selectFriendshipTest() {
-        Friendship friendship = friendshipMapper.selectFriendship(1, 2);
-        List<Friendship> list = friendshipMapper.selectFriendshipsByHostId(4);
-        list = null;
-    }
+    /*
+     * 查询方法测试比较复杂，因此暂时忽略
+     */
 }

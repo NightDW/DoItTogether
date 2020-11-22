@@ -25,6 +25,8 @@
 <!-- 在此添加页面主体信息 -->
 <div role="tabpanel" class="tab-pane" id="tasks">
     <div class="tasks">
+
+        <!-- 表格的标题行 -->
         <table class="table">
             <tr>
                 <th style="text-align: left;">Title</th>
@@ -38,7 +40,9 @@
             </tr>
         </table>
 
+        <!-- 显示任务信息 -->
         <div th:replace="fragments::showTaskList1(${tasks}, 1)"></div>
+
     </div>
 </div>
 
@@ -59,28 +63,25 @@
 <!-- 引入常用的函数 -->
 <script th:replace="fragments::usefulFunctions"></script>
 
+<!-- 和表单提交相关的一些JS代码 -->
 <script>
     var taskOptForm = $("#taskOtpForm");
     var tid = $("#tid");
     var result = $("#result");
     function optFunction(obj) {
-        taskOptForm.attr("action", taskOptForm.attr("action") + $(obj).attr("opt"));
         tid.attr("value", $(obj).attr("tid"));
         if($(obj).attr("opt") === 'fin'){
             result.attr("name", "result");
             var res = prompt("Please enter your task result: ");
-            if(res == null)
+            if(isEmptyStr(res)){
+                alert("Quit!");
                 return;
+            }
             result.attr("value", res);
         }
+        //action放到这里才设置，防止在取消完成任务后action被修改，导致再次点击完成按钮时出错
+        taskOptForm.attr("action", taskOptForm.attr("action") + $(obj).attr("opt"));
         taskOptForm.submit();
-    }
-</script>
-
-<script>
-    function deleteMsgFunction(obj) {
-        $("#mid").attr("value", $(obj).attr("mid"));
-        $("#del-msg-form").submit();
     }
 </script>
 

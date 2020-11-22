@@ -4,22 +4,26 @@ import com.laidw.entity.Message;
 
 import java.util.List;
 
+/**
+ * 主要负责Message相关的业务，部分方法的作用可以参考MessageMapper
+ */
 public interface MessageService {
 
     int sendSystemMsgTo(Integer uid, String content);
 
-    //返回插入的消息的id
-    int sendMsg(Boolean isPrivate, Integer senderId, Integer acceptorId, String content);
+    int sendMsgReturnId(Boolean isPrivate, Integer senderId, Integer acceptorId, String content);
 
     int deleteMessageById(Integer id);
 
-    int deleteMessagesBetween(Integer id1, Integer id2);
+    int deletePrivateMessagesBetween(Integer id1, Integer id2);
 
-    int deleteMessagesByGroupId(Integer gid);
+    int deleteGroupMessagesByGroupId(Integer gid);
 
     int updateGroupMessageSenderId(Integer oldId, Integer newId, Integer groupId);
 
-    List<Message> selectMessagesByGroupId(Integer gid);
+    Message selectMessageById(Integer id);
 
-    List<Message> selectMessagesBetween(Integer id1, Integer id2);
+    List<Message> selectGroupMessagesByGroupId(Integer gid);
+
+    List<Message> selectPrivateMessagesBetween(Integer id1, Integer id2);
 }

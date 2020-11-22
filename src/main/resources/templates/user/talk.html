@@ -22,23 +22,26 @@
 <!-- 引入导航条 -->
 <div th:replace="fragments::nevigate"></div>
 
-
 <!-- 在此添加页面主体信息 -->
 <div class="main messages">
+
+    <!-- 显示消息 -->
     <div class="top-part">
-        <a th:href="@{/friend/} + ${friendship.id}"><span class="glyphicon glyphicon-refresh refresh"></span></a>
+        <a style="position: fixed" th:href="@{/friend/} + ${friendship.id}"><span class="glyphicon glyphicon-refresh refresh"></span></a>
         <div th:class="'media ' + ${message.senderPubInfo.id == #authentication.principal.id ? 'my-msg' : 'other-msg'}" th:each="message : ${friendship.messages}">
-            <!-- 显示在左边的头像，也就是其他人的头像 -->
+
+            <!-- 显示在左边的头像，也就是私聊对象的头像 -->
             <div th:if="${message.senderPubInfo.id != #authentication.principal.id}" class="media-left media-middle">
                 <a th:href="@{/user/} + ${message.senderPubInfo.id}"><img class="icon img-circle" th:src="@{/img/} + ${message.senderPubInfo.iconUrl}"></a>
                 <button class="btn btn-danger btn-xs" disabled>Delete</button>
             </div>
 
+            <!-- 消息的内容 -->
             <div class="media-body">
                 <p>
                     <a th:href="@{/user/} + ${message.senderPubInfo.id}">
                         <span th:if="${message.senderPubInfo.id == #authentication.principal.id}" th:text="${message.senderPubInfo.username}"></span>
-                        <span th:if="${message.senderPubInfo.id != #authentication.principal.id}" th:text="${message.senderPubInfo.username} + '(' + ${friendship.remarks == null ? 'NoRemarks' : friendship.remarks} + ')'"></span>
+                        <span th:if="${message.senderPubInfo.id != #authentication.principal.id}" th:text="${message.senderPubInfo.username} + ' - ' + ${friendship.remarks == null ? 'NoRemarks' : friendship.remarks}"></span>
                     </a>
                 </p>
                 <p th:text="${#dates.format(message.sendTime, 'yyyy-MM-dd HH:mm:ss')}"></p>
@@ -51,21 +54,17 @@
                 <!-- 该消息是本人发送的，可以删除此消息 -->
                 <button class="btn btn-danger btn-xs" th:attr="mid=${message.id}" onclick="delMsgFunction(this)">Delete</button>
             </div>
+
         </div>
     </div>
+
+    <!-- 发送消息的表单 -->
     <div class="bottom-part">
         <button id="send-msg-btn" class="btn btn-lg btn-primary" onclick="sendMsgFunction()" type="button">Send</button>
         <input id="text" class="form-control-static" placeholder="Say something..." />
     </div>
-</div>
 
-<!-- 发送消息用的表单，已改用AJAX发送消息 -->
-<!--<form id="sendMsgform" th:action="@{/message}" method="post">-->
-    <!--<input type="hidden" name="isPrivate" value="true" />-->
-    <!--<input type="hidden" name="senderId" th:value="${#authentication.principal.id}" />-->
-    <!--<input type="hidden" name="acceptorId" th:value="${friendship.guestPubInfo.id}" />-->
-    <!--<input type="hidden" id="content" name="content">-->
-<!--</form>-->
+</div>
 
 <!-- 引入底部信息 -->
 <div th:replace="fragments::footer"></div>
@@ -80,8 +79,6 @@
 <!-- 发送/删除消息相关 -->
 <script>
     function sendMsgFunction(){
-        // $("#content").val($("#text").val());
-        // $("#sendMsgform").submit();
         var text = $("#text");
         var id = '[[${#authentication.principal.id}]]';
         var acceptorId = '[[${friendship.guestPubInfo.id}]]';
@@ -92,9 +89,9 @@
             url: "/message",
             data: data,
             success: function (result) {
-                if(isEmptyStr(result) || result === 'Failed')
-                    $("#top-msg").text("Failed to send message!");
-                else{
+                if(isEmptyStr(result) || result.startsWith('Failed')){
+                    $("#top-msg").text(result);
+                } else{
                     var username = '[[${#authentication.principal.username}]]';
                     var iconUrl = '[[${#authentication.principal.iconUrl}]]';
                     var index = result.indexOf(';');
@@ -129,18 +126,19 @@
             method: "delete",
             url: "/message",
             data: data,
-            success:function(result){
+            success: function(result){
                 if(!isEmptyStr(result) && result === 'OK'){
                     $("#top-msg").text("Deleted successfully!");
                     $(obj).parents(".media").remove();
-                }
-                else
+                } else{
                     $("#top-msg").text("Error occurred!");
+                }
             }
         });
     }
 </script>
 
+<!-- 滚动到显示最新的消息 -->
 <script>
     $(function () {
         document.querySelector(".media:last-child").scrollIntoView();

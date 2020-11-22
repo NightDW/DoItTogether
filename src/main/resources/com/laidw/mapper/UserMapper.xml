@@ -131,6 +131,7 @@
 
 
     <!-- =============================编写SQL语句============================= -->
+
     <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO
         <include refid="tableName" />
@@ -138,11 +139,13 @@
         VALUES
         <include refid="insertClassAtts" />
     </insert>
+
     <delete id="deleteUserById">
         DELETE FROM
         <include refid="tableName" />
         <include refid="whereId" />
     </delete>
+
     <update id="updateUserById">
         UPDATE
         <include refid="tableName" />
@@ -151,6 +154,7 @@
         </set>
         <include refid="whereId" />
     </update>
+
     <update id="updateUserByIdSelectively">
         UPDATE
         <include refid="tableName" />
@@ -159,40 +163,48 @@
         </set>
         <include refid="whereId" />
     </update>
+
     <select id="selectUserById" resultMap="fullMap">
         SELECT * FROM
         <include refid="tableName" />
         <include refid="whereId" />
     </select>
+
     <select id="selectUserPubInfoById" resultMap="onlyPubInfoMap">
         SELECT * FROM
         <include refid="tableName" />
         <include refid="whereId" />
     </select>
+
     <select id="selectUserByCondition" resultMap="fullMap">
         SELECT * FROM
         <include refid="tableName" />
         <include refid="whereCondition" />
     </select>
+
     <select id="selectUserPubInfoByCondition" resultMap="onlyPubInfoMap">
         SELECT * FROM
         <include refid="tableName" />
         <include refid="whereCondition" />
     </select>
+
     <select id="selectAllUsers" resultMap="fullMap">
         SELECT * FROM
         <include refid="tableName" />
     </select>
+
     <select id="searchUsersLike" resultMap="onlyPubInfoMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE username LIKE #{key} OR introduction LIKE #{key}
     </select>
+
     <select id="searchUserByKey" resultMap="onlyPubInfoMap">
         SELECT * FROM
         <include refid="tableName" />
         WHERE username = #{key} OR introduction = #{key} OR email = #{key} OR phone = #{key}
     </select>
+
     <!-- =============================编写SQL语句============================= -->
 
 </mapper>

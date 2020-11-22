@@ -5,7 +5,10 @@
 
 <head>
     <meta charset="UTF-8">
+
+    <!-- 添加这个标签，页面加载完成3秒后自动登出 -->
     <meta http-equiv="refresh" th:content="'3;url=' + @{/logout}" />
+
     <title>Logout Soon</title>
 
     <!-- 引入fragments.css文件 -->
@@ -24,6 +27,7 @@
 <div th:replace="fragments::nevigate"></div>
 
 <!-- 在此添加页面主体信息 -->
+<h3 class="notice">You are going to logout! Please wait...</h3>
 
 <!-- 引入底部信息 -->
 <div th:replace="fragments::footer"></div>
