@@ -20,9 +20,8 @@ import java.io.File;
 
 /**
  * 主要负责处理用户/群组头像上传的业务
- * 这两个功能的代码重复度较高，因此再定义一个Controller来统一处理
- * 修改前，群组头像相关的url为/group/icon/{gid}，用户头像相关的url为/user/icon
- * 修改后，群组头像相关的url为/icon/group/{gid}，用户头像相关的url为/icon/user/{xxx}
+ * 这两个功能的代码重复度较高，因此定义该Controller来统一处理
+ * 群组头像相关的url为/icon/group/{gid}，用户头像相关的url为/icon/user/{xxx}
  */
 @Controller
 @RequestMapping("/icon")
@@ -47,8 +46,8 @@ public class ImageController {
     /**
      * 前往头像上传页面
      * @param type 表示要上传用户头像还是群组头像
-     * @param gid 要修改头像的群组的id，如果是修改用户头像，则该忽略参数
-     * @param msg 携带的消息，设置该参数是为了方便其它的控制器方法调用本方法
+     * @param gid 要修改头像的群组的id，如果是修改用户头像，则可以忽略该参数
+     * @param msg 携带的消息，该参数主要由控制器的其它方法提供
      * @return 头像上传页面
      */
     @GetMapping("/{type}/{gid}")
@@ -64,13 +63,19 @@ public class ImageController {
     /**
      * 负责处理用户上传图片的请求
      * @param type 表示用户上传的是用户头像还是群组头像
-     * @param gid 群组的id，如果是上传用户头像，则该忽略参数
+     * @param gid 群组的id，如果是上传用户头像，则可以忽略该参数
      * @param icon 用户上传的图片
-     * @param request HTTP请求参数
+     * @param request HTTP请求对象
      * @return 如果上传失败，则回到上传页面；如果上传成功，则回到群组详细信息页面或自动登录页面
      */
     @PostMapping("/{type}/{gid}")
     public ModelAndView doGroupIconUpload(@PathVariable String type, @PathVariable Integer gid, MultipartFile icon, HttpServletRequest request) {
+
+        //如果用户没上传文件或文件没有后缀名或上传的文件不是图片，则把错误信息告知用户并转发回上传头像页面
+        String filename = icon.getOriginalFilename();
+        String fileType = icon.getContentType();
+        if (icon.getSize() == 0 || filename == null || filename.lastIndexOf('.') == -1 || fileType == null || !fileType.startsWith("image/"))
+            return toIconUploadPage(type, gid, "Please upload an image!");
 
         //如果是修改群组头像，则先判断用户是否有权限
         if("group".equals(type)){
@@ -82,13 +87,7 @@ public class ImageController {
                 return groupController.toGroupTalkPage(gid, false, "You have no right to change the icon of this group!");
         }
 
-        //如果用户没上传文件或文件没有后缀名或上传的文件不是图片，则把错误信息告知用户并转发回上传头像页面
-        String filename = icon.getOriginalFilename();
-        String fileType = icon.getContentType();
-        if (icon.getSize() == 0 || filename == null || filename.lastIndexOf('.') == -1 || fileType == null || !fileType.startsWith("image/"))
-            return toIconUploadPage(type, gid, "Please upload an image!");
-
-        //如果用户上传了图片，则为它生成一个唯一的文件名
+        //为图片生成一个唯一的文件名
         filename = WebHelper.generateUUID() + filename.substring(filename.lastIndexOf('.'));
 
         try {
@@ -99,7 +98,7 @@ public class ImageController {
             return toIconUploadPage(type, gid, "Failed to save image! Reason: " + e.getMessage());
         }
 
-        //如果图片上传成功，则修改数据库数据，并转发到另一个页面
+        //如果图片上传成功，则根据修改的是用户头像还是群组头像来决定下一步怎么做
         return "group".equals(type) ? doGroup(filename, gid) : doUser(filename);
     }
 

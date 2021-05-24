@@ -57,6 +57,8 @@ public class MembershipServiceImpl implements MembershipService {
 
     public void joinGroup(Integer uid, Integer gid, Role role, String nickname) {
         int mid = insertMembershipReturnId(uid, gid, role, nickname);
+
+        //新加入的用户自动在群里发送打招呼的消息
         messageService.sendMsgReturnId(false, mid, gid, joinInGroupMsg);
     }
 
@@ -68,8 +70,10 @@ public class MembershipServiceImpl implements MembershipService {
         messageService.updateGroupMessageSenderId(userMembership.getId(), systemMembership.getId(), gid);
         taskService.transferFinishedTaskAccIdInThisGroup(userMembership.getId(), systemMembership.getId(), systemUser.getId(), gid);
 
-        //放弃未完成的任务，然后删除该用户的Membership信息
+        //放弃未完成的任务
         taskService.giveUpMyUnfinishedTasksInThisGroup(userMembership.getId(), gid);
+
+        //删除该用户的Membership信息
         membershipMapper.deleteMembershipByUG(uid, gid);
     }
 
@@ -82,26 +86,18 @@ public class MembershipServiceImpl implements MembershipService {
     }
 
     public Membership selectMembershipByUG(Integer uid, Integer gid, Boolean onlyPubInfo) {
-        if(onlyPubInfo)
-            return membershipMapper.selectMembershipPubInfoByUG(uid, gid);
-        return membershipMapper.selectMembershipByUG(uid, gid);
+        return onlyPubInfo ? membershipMapper.selectMembershipPubInfoByUG(uid, gid) : membershipMapper.selectMembershipByUG(uid, gid);
     }
 
     public Membership selectMembershipById(Integer mid, Boolean onlyPubInfo) {
-        if(onlyPubInfo)
-            return membershipMapper.selectMembershipPubInfoById(mid);
-        return membershipMapper.selectMembershipById(mid);
+        return onlyPubInfo ? membershipMapper.selectMembershipPubInfoById(mid) : membershipMapper.selectMembershipById(mid);
     }
 
     public List<Membership> selectMembershipsByUserId(Integer uid, Boolean onlyPubInfo) {
-        if(onlyPubInfo)
-            return membershipMapper.selectMembershipsPubInfoByUserId(uid);
-        return membershipMapper.selectMembershipsByUserId(uid);
+        return onlyPubInfo ? membershipMapper.selectMembershipsPubInfoByUserId(uid) : membershipMapper.selectMembershipsByUserId(uid);
     }
 
     public List<Membership> selectMembershipsByGroupId(Integer gid, Boolean onlyPubInfo) {
-        if(onlyPubInfo)
-            return membershipMapper.selectMembershipsPubInfoByGroupId(gid);
-        return membershipMapper.selectMembershipsByGroupId(gid);
+        return onlyPubInfo ? membershipMapper.selectMembershipsPubInfoByGroupId(gid) : membershipMapper.selectMembershipsByGroupId(gid);
     }
 }

@@ -27,7 +27,7 @@ public class MembershipController{
 
     /**
      * 查询当前用户加入的群组，并展示出来
-     * @param msg 需要显示的消息，主要是为了方便其它控制器方法调用
+     * @param msg 需要显示的消息，该参数主要由其它控制器方法提供
      * @return 群组列表页面
      */
     @GetMapping("/my")
@@ -71,7 +71,7 @@ public class MembershipController{
 
     /**
      * 处理用户发送的修改群昵称的AJAX请求
-     * @param mid      Membership的id
+     * @param mid Membership的id
      * @param nickname 修改后的昵称
      * @return 固定返回"OK"
      */
@@ -87,7 +87,7 @@ public class MembershipController{
     /**
      * 处理群管理员的修改群成员权限的请求
      * @param membership 修改后的数据
-     * @param gid        所在群组的id，方便判断用户是否有权限，也可用于重新回到该群组的详细信息页面
+     * @param gid 所在群组的id，方便判断用户是否有权限，也可用于重新回到该群组的详细信息页面
      * @return 返回到群组的详细信息页面
      */
     @PutMapping("/right")

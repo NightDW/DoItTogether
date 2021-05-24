@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS t_message(
   sender_id    INT            NOT NULL,
   send_time    VARCHAR(255)   NOT NULL,
   content      VARCHAR(255)   NOT NULL
-  -- 由于acc_id既可以是userId，也可能是groupId，因此不添加外键约束
-  -- 后续更新：由于send_id既可以是userId，也可以是membershipId，因此也不添加外键约束
+  -- 由于acc_id既可以是userId，也可以是groupId，因此不添加外键约束
+  -- 另外，由于send_id既可以是userId，也可以是membershipId，因此也不添加外键约束
   -- CONSTRAINT FOREIGN KEY(sender_id) REFERENCES t_user(id)
 );
 
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS  t_friend(
 CREATE TABLE IF NOT EXISTS t_task(
   id           INT            PRIMARY KEY AUTO_INCREMENT,
   pub_time     VARCHAR(255)   NOT NULL,
-  -- 结束时间可为空，在完成任务后才非空
+  -- 结束时间可为空，在任务被完成后该字段才非空
   fin_time     VARCHAR(255),
   title        VARCHAR(255)   NOT NULL,
   content      VARCHAR(255)   NOT NULL,

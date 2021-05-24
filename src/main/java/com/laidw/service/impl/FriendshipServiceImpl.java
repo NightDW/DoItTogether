@@ -40,7 +40,11 @@ public class FriendshipServiceImpl implements FriendshipService {
     }
 
     public void deleteFriendshipPairByHG(Integer hid, Integer gid) {
+
+        //删除好友记录前需要删除两人之间的私聊记录
         messageService.deletePrivateMessagesBetween(hid, gid);
+
+        //注意这里需要成对删除好友记录
         friendshipMapper.deleteFriendshipByHG(hid, gid);
         friendshipMapper.deleteFriendshipByHG(gid, hid);
     }

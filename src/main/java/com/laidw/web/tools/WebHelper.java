@@ -15,7 +15,7 @@ public class WebHelper {
 
     /**
      * 用于获取项目的根url，需要额外提供两个参数，以便在PROJECT_URL为空时初始化它
-     * 这种懒汉式加载不会有线程安全问题，因为PROJECT_URL其实是一个常量
+     * 这种懒汉式加载并不会有线程安全问题，因为PROJECT_URL本质上其实是一个常量
      * @param request HTTP请求对象
      * @param seg 不包含主机名称的uri，不能以'/'开头
      * @return 项目的根url

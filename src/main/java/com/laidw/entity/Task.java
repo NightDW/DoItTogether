@@ -25,7 +25,7 @@ public class Task {
     private Date pubTime;
 
     /**
-     * 任务的完成时间，该字段可作为判断任务是否已完成的依据
+     * 任务的完成时间，该字段可用于判断任务是否已完成
      */
     private Date finTime;
 
@@ -40,13 +40,13 @@ public class Task {
     private String content;
 
     /**
-     * 接受者在完成任务后可以提交额外的信息
-     * 该字段用于保存这个信息，方便其它成员查看完成结果
+     * 任务接收者可以在提交任务时顺便提交额外的信息
+     * 因此使用该字段来保存完成者提交的信息，方便其它成员查看完成结果
      */
     private String result;
 
     /**
-     * 任务所在群的id，由于本群内的任务只有在本群内可见，因此保存群id方便查找即可
+     * 任务所在群的id；由于本群内的任务只有在本群内可见，因此这里只需要保存群id即可
      */
     private Integer groupId;
 
@@ -57,8 +57,8 @@ public class Task {
 
     /**
      * 任务的父任务id，如果该字段为空，说明该任务是根任务
-     * 查询到根任务后，取出其id，然后根据fatherId = id条件继续查找叶子任务
-     * 这里不能用Task father字段表示父任务，避免循环重复查找
+     * 查询到根任务后，取出其id，然后根据fatherId = {id}条件继续查找该任务的子任务
+     * 注意，这里不能用Task father字段来表示父任务，避免循环重复查找
      */
     private Integer fatherId;
 

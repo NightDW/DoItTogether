@@ -149,7 +149,7 @@
         UPDATE
         <include refid="tableName" />
         SET acc_id = NULL, acc_user_id = NULL
-        <include refid="whereId" /> AND fin_time IS NULL
+        WHERE id = #{id} AND fin_time IS NULL
     </update>
 
     <update id="giveUpMyUnfinishedTasksInThisGroup">

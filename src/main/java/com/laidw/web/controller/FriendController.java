@@ -60,7 +60,7 @@ public class FriendController{
             return "NO_NEED";
 
         //否则，拼接一个同意的链接，然后向目标用户发送系统消息
-        //注意，验证链接需要拼接上申请者的验证码，用于证明申请者确实是发送了申请
+        //注意，验证链接需要拼接上申请者的验证码，用于证明申请者确实发送了申请
         String projectUrl = WebHelper.getProjectUrl(request, "friend");
         String userInfoLink = "<a href='" + projectUrl + "user/" + currentUser.getId() + "'>" + currentUser.getUsername() + "</a>";
         String agreeLink = "<a href='" + projectUrl + "friend/agree/" + currentUser.getId() + "?verifyCode=" + currentUser.getVerifyCode() + "'>Click to consent</a>";
@@ -82,14 +82,14 @@ public class FriendController{
         if(hid.equals(gid))
             return toMyFriendsPage("Error! You cannot be friends with yourself!");
 
-        //如果目标用户的验证码和当前用户提供的验证码不一致，说明目标用户可能根本没有发送好友申请
+        //如果目标用户的验证码和当前用户提供的验证码不一致，说明目标用户可能根本没有给当前用户发送好友申请
         User guest = userService.selectUserByCondition(new User(gid), true);
         if(!guest.getVerifyCode().equals(verifyCode))
             return toMyFriendsPage("VerifyCode Error!");
 
         boolean hasBeenFriends = friendshipService.selectFriendshipByHG(hid, gid) != null;
 
-        //如果两人还不是好友，则添加两条好友记录，然后当前用户向目标用户发送一条消息
+        //如果两人还不是好友，则添加两条好友记录，然后当前用户向目标用户发送一条打招呼的消息
         if(!hasBeenFriends){
             friendshipService.insertFriendshipPair(hid, gid);
             messageService.sendMsgReturnId(true, hid, gid, becomeFriendMsg);
@@ -100,7 +100,7 @@ public class FriendController{
         //mav.addObject("friendship", friendshipService.selectFriendshipByHG(WebHelper.getCurrentUser().getId(), gid));
         //mav.addObject("msg", hasBeenFriends ? "You had been friends!" : "Became friends successfully!");
 
-        //这里我选择直接转发到好友列表页面，同时立刻打开与该好友的聊天页面
+        //直接转发到好友列表页面，同时立刻打开与该好友的聊天页面
         ModelAndView mav = toMyFriendsPage(hasBeenFriends ? "You had been friends!" : "Became friends successfully!");
         mav.addObject("activeUserId", gid);
         return mav;
@@ -108,7 +108,7 @@ public class FriendController{
 
     /**
      * 查询出当前用户的所有好友并显示
-     * @param msg 需要给目标页面添加的消息，这个参数主要是提供给本Controller的其它方法的
+     * @param msg 需要给目标页面添加的消息，这个参数由本Controller的其它方法提供
      * @return 转发到好友列表页面
      */
     @GetMapping("/my")
@@ -119,7 +119,6 @@ public class FriendController{
         List<Friendship> friendships = friendshipService.selectFriendshipsByHostId(WebHelper.getCurrentUser().getId());
         Collections.sort(friendships);
 
-        //给ModelAndView添加Object
         mav.addObject("friendships", friendships);
         mav.addObject("msg", msg);
         return mav;

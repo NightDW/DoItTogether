@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * 用于保存DIT平台上注册的账户的信息
- * 实现UserDetails接口，让SpringSecurity也能够获取到用户信息
+ * 该类实现了UserDetails接口，以让SpringSecurity也能够获取到用户信息
  */
 @Getter@Setter
 @NoArgsConstructor
@@ -49,7 +49,7 @@ public class User implements UserDetails {
     private String email;
 
     /**
-     * 账户的电话（不严格要求）
+     * 账户的电话（暂时不严格要求，因此该属性可以随意填写）
      */
     private String phone;
 
@@ -84,7 +84,7 @@ public class User implements UserDetails {
     private List<Membership> memberships;
 
     /**
-     * 该用户接收的任务，注意我们不需要过多地关心该用户发布的任务
+     * 该用户接收的任务；注意我们不需要过多地关心该用户发布的任务
      * 必要时只需要在任务的详细信息中展示发布者的信息即可
      */
     private List<Task> acceptedTasks;
@@ -94,7 +94,7 @@ public class User implements UserDetails {
     }
 
     /**
-     * 获取用户的权限信息，本工程不涉及复杂的权限，直接返回该用户的角色（即身份）即可，注意需要以"ROLE_"开头
+     * SpringSecurity将通过该方法获取用户的权限信息；由于本工程不涉及复杂的权限，因此这里返回该用户的角色即可，注意角色需要以"ROLE_"开头
      * @return 封装后的用户的身份信息
      */
     public Collection<? extends GrantedAuthority> getAuthorities() {

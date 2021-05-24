@@ -64,10 +64,13 @@
         <result column="role" property="role" />
         <result column="nickname" property="nickname" />
         <result column="is_mute" property="isMute" />
+
         <association property="userPubInfo" column="user_id"
                      select="com.laidw.mapper.UserMapper.selectUserPubInfoById" />
+
         <association property="groupPubInfo" column="group_id"
                      select="com.laidw.mapper.GroupMapper.selectGroupPubInfoById" />
+
     </resultMap>
 
     <resultMap id="fullMap" type="com.laidw.entity.Membership" extends="onlyPubInfoMap">

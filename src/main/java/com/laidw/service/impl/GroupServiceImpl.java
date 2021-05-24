@@ -37,7 +37,7 @@ public class GroupServiceImpl implements GroupService {
     @Autowired
     private User systemUser;
 
-    @Value("${dit.system-user.nickname}")
+    @Value("${dit.system-user.group-nickname}")
     private String nickname;
 
     @Value("${dit.img.default-img.group}")
@@ -71,14 +71,10 @@ public class GroupServiceImpl implements GroupService {
     }
 
     public Group selectGroupById(Integer id, Boolean onlyPubInfo) {
-        if(onlyPubInfo)
-            return groupMapper.selectGroupPubInfoById(id);
-        return groupMapper.selectGroupById(id);
+        return onlyPubInfo ? groupMapper.selectGroupPubInfoById(id) : groupMapper.selectGroupById(id);
     }
 
     public List<Group> searchGroups(String key, Boolean rough) {
-        if(rough)
-            return groupMapper.searchGroupsLike("%" + key + "%");
-        return groupMapper.searchGroupsByKey(key);
+        return rough ? groupMapper.searchGroupsLike("%" + key + "%") : groupMapper.searchGroupsByKey(key);
     }
 }

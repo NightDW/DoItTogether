@@ -27,7 +27,7 @@ public class Group {
     private String slogan;
 
     /**
-     * 该群的头像地址
+     * 群组的头像地址
      */
     private String iconUrl;
 

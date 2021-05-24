@@ -76,20 +76,22 @@
     <delete id="deletePrivateMessagesBetween">
         DELETE FROM
         <include refid="tableName" />
-        WHERE is_private = TRUE AND ((sender_id = #{param1} AND acc_id = #{param2}) OR (sender_id = #{param2} AND acc_id = #{param1}))
+        WHERE is_private = 1 AND (
+            (sender_id = #{param1} AND acc_id = #{param2}) OR (sender_id = #{param2} AND acc_id = #{param1})
+        )
     </delete>
 
     <delete id="deleteGroupMessagesByGroupId">
         DELETE FROM
         <include refid="tableName" />
-        WHERE is_private = false AND acc_id = #{gid}
+        WHERE is_private = 0 AND acc_id = #{gid}
     </delete>
 
     <update id="updateGroupMessageSenderId">
         UPDATE
         <include refid="tableName" />
         SET sender_id = #{nid}
-        WHERE sender_id = #{oid} AND acc_id = #{gid} AND is_private = 0
+        WHERE is_private = 0 AND sender_id = #{oid} AND acc_id = #{gid}
     </update>
 
     <select id="selectMessageById" resultMap="messageMap">
@@ -101,13 +103,15 @@
     <select id="selectGroupMessagesByGroupId" resultMap="messageMap">
         SELECT * FROM
         <include refid="tableName" />
-        WHERE is_private = FALSE AND acc_id = #{gid}
+        WHERE is_private = 0 AND acc_id = #{gid}
     </select>
 
     <select id="selectPrivateMessagesBetween" resultMap="messageMap">
         SELECT * FROM
         <include refid="tableName" />
-        WHERE is_private = TRUE AND ((sender_id = #{param1} AND acc_id = #{param2}) OR (sender_id = #{param2} AND acc_id = #{param1}))
+        WHERE is_private = 1 AND (
+            (sender_id = #{param1} AND acc_id = #{param2}) OR (sender_id = #{param2} AND acc_id = #{param1})
+        )
     </select>
 
     <!-- =============================编写SQL语句============================= -->

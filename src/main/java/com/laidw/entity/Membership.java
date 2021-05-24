@@ -17,17 +17,17 @@ public class Membership implements Comparable<Membership>{
     private Integer id;
 
     /**
-     * 为了防止嵌套查询，同时保护隐私，这里只保存用户的公开信息
+     * 为了防止嵌套查询，同时也是为了保护隐私，这里只保存该用户的公开信息
      */
     private User userPubInfo;
 
     /**
-     * 为了防止嵌套查询，同时保护隐私，这里只保存用户所在的群组的公开信息
+     * 为了防止嵌套查询，同时也是为了保护隐私，这里只保存该用户所在的群组的公开信息
      */
     private Group groupPubInfo;
 
     /**
-     * 用户在本群中的角色，注意和User类中的角色区分开
+     * 该用户在本群中的角色，注意和User类中的角色区分开
      */
     private Role role;
 
@@ -54,18 +54,18 @@ public class Membership implements Comparable<Membership>{
     /**
      * 实现比较方法
      * @param o 被比较的对象
-     * @return 返回值表示要根据value值从大到小进行排序
+     * @return 返回值表示要根据value值进行从大到小的排序
      */
     public int compareTo(Membership o) {
         return o.getValue() - getValue();
     }
 
     /**
-     * 根据id isTop isShow来计算该Membership的评价值，评价值用于排序
-     * @return 该对象的评价值，评价值越高排序应该越靠前
+     * 根据id isTop isShow属性来计算该Membership的评价值（计算方式和Friendship一样），评价值用于排序
+     * @return 该对象的评价值，评价值高的排在前面
      */
     public int getValue(){
-        return - id + (isTop ? 100000 : 0) - (isShow ? 0 : 1000000);
+        return -id + (isTop ? 100000 : 0) - (isShow ? 0 : 1000000);
     }
 
     public Membership(Integer id) {

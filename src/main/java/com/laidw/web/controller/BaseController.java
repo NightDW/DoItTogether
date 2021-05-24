@@ -160,7 +160,7 @@ public class BaseController {
             return mav;
         }
 
-        //如果发送成功，则转发到登录页面，注意不能把查到的用户数据传给登录页面，防止A通过找回功能获取到B账号的密码
+        //如果发送成功，则转发到登录页面，注意不能把查到的用户数据传给登录页面，防止用户A通过找回功能获取到B账号的密码
         mav.addObject("msg", "Sent your account info to your email successfully!");
         mav.setViewName(HtmlPageHelper.LOGIN);
         return mav;

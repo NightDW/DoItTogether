@@ -34,6 +34,8 @@ public class UserController{
     public ModelAndView toModifyMyInfoPage(){
         ModelAndView mav = new ModelAndView(HtmlPageHelper.USER_INFO);
         mav.addObject("user", WebHelper.getCurrentUser());
+
+        //USER_INFO页面可以同时作为注册页面和修改页面，因此需要通过title属性来进行区分
         mav.addObject("title", "Modify");
         return mav;
     }

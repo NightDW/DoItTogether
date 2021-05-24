@@ -6,9 +6,9 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * 用于保存主用户与客用户的好友关系；客用户是主用户的好友，反过来不一定
+ * 用于保存主用户与客用户的好友关系：客用户是主用户的好友，但反过来不一定
  * 为了保护其他人的隐私，用户只能查询主用户为自己的好友关系
- * 注意，本类实现了Comparable接口，方便进行排序
+ * 注意，本类实现了Comparable接口，用于进行排序
  */
 @Getter@Setter
 public class Friendship implements Comparable<Friendship> {
@@ -19,7 +19,7 @@ public class Friendship implements Comparable<Friendship> {
     private Integer id;
 
     /**
-     * 主用户id，由于主用户就是当前登录的用户本身，因此保存其id即可
+     * 主用户id，由于主用户就是当前登录的用户本身，因此保存其id以方便查找数据库即可
      */
     private Integer hostId;
 
@@ -52,7 +52,7 @@ public class Friendship implements Comparable<Friendship> {
     /**
      * 实现比较方法，value值更大的Friendship记录将在好友列表更靠前的地方显示
      * @param o 与当前对象进行比较的对象
-     * @return 返回o.getValue() - getValue()表示将对value值进行从大到小的排序
+     * @return 返回o.getValue() - getValue()表示将根据value值进行从大到小的排序
      */
     public int compareTo(Friendship o) {
         return o.getValue() - getValue();
@@ -60,11 +60,11 @@ public class Friendship implements Comparable<Friendship> {
 
     /**
      * 获取Friendship对象的value值，value值越大，显示越靠前
-     * id越小，对象的value值越大，即对象默认按id值从小到大进行显示
+     * 对象默认按id值从小到大进行显示，因此id越小，对象的value值越大
      * 如果置顶，则value值加上100000；如果隐藏，则value值减去1000000
      * @return Friendship的value值
      */
     public int getValue(){
-        return - id + (isTop ? 100000 : 0) - (isShow ? 0 : 1000000);
+        return -id + (isTop ? 100000 : 0) - (isShow ? 0 : 1000000);
     }
 }

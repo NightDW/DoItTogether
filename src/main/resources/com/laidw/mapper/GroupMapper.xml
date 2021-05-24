@@ -59,12 +59,16 @@
     </resultMap>
 
     <resultMap id="fullMap" type="com.laidw.entity.Group" extends="onlyPubInfoMap">
+
         <collection property="memberships" column="id"
                     select="com.laidw.mapper.MembershipMapper.selectMembershipsPubInfoByGroupId" />
+
         <collection property="messages" column="id"
                     select="com.laidw.mapper.MessageMapper.selectGroupMessagesByGroupId" />
+
         <collection property="tasks" column="id"
                     select="com.laidw.mapper.TaskMapper.selectRootFullTasksByGroupId" />
+
     </resultMap>
 
     <!-- =============================定义封装规则============================= -->

@@ -47,15 +47,11 @@ public class UserServiceImpl implements UserService {
     }
 
     public int updateUserById(User user, Boolean isSelectively) {
-        if(isSelectively)
-            return userMapper.updateUserByIdSelectively(user);
-        return userMapper.updateUserById(user);
+        return isSelectively ? userMapper.updateUserByIdSelectively(user) : userMapper.updateUserById(user);
     }
 
     public User selectUserByCondition(User user, Boolean onlyPubInfo) {
-        if(onlyPubInfo)
-            return userMapper.selectUserPubInfoByCondition(user);
-        return userMapper.selectUserByCondition(user);
+        return onlyPubInfo ? userMapper.selectUserPubInfoByCondition(user) : userMapper.selectUserByCondition(user);
     }
 
     public List<User> selectAllUsers() {
@@ -63,8 +59,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public List<User> searchUsers(String key, Boolean rough) {
-        if(rough)
-            return userMapper.searchUsersLike("%" + key + "%");
-        return userMapper.searchUserByKey(key);
+        return rough ? userMapper.searchUsersLike("%" + key + "%") : userMapper.searchUserByKey(key);
     }
 }

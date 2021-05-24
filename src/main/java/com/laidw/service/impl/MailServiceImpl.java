@@ -17,7 +17,7 @@ import java.io.File;
 import java.util.Map;
 
 /**
- * MailService的实现类
+ * MailService的实现类（本类代码基本上是固定的，无需修改）
  */
 @Service
 @Transactional

@@ -83,7 +83,7 @@ public class TaskController{
     @PutMapping
     public ModelAndView doUpdateTask(Task task){
 
-        //TODO 权限验证，但考虑到发送PUT请求比较麻烦，该方法很难被访问，而且这里权限验证比较复杂，因此暂时不考虑
+        //TODO 权限验证；但考虑到发送PUT请求比较麻烦，该方法很难被访问到，而且这里权限验证比较复杂，因此暂时不考虑
 
         taskService.updateTaskByIdSelectively(task);
         if(task.getGroupId() == null)
@@ -129,7 +129,7 @@ public class TaskController{
     @PutMapping("/split")
     public ModelAndView doSplitTask(Integer fid, Integer gid, TasksTO tasksTO){
 
-        //TODO 权限验证，这里暂时忽略
+        //TODO 权限验证，这里暂时忽略，理由同上
 
         if(tasksTO.getTasks() == null)
             return groupController.toGroupTalkPage(gid, true, "Split cancelled!");

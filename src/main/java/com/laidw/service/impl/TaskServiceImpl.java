@@ -38,11 +38,8 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskMapper.selectTaskById(id);
 
         //如果不是叶子任务，则先删除其子任务
-        if(task.getHasSon()){
-            for(Task son : task.getSons()){
-                deleteFullTaskById(son.getId());
-            }
-        }
+        if(task.getHasSon())
+            task.getSons().forEach(son -> deleteFullTaskById(son.getId()));
 
         //然后再删除本条记录
         taskMapper.deleteTaskById(id);
@@ -51,7 +48,7 @@ public class TaskServiceImpl implements TaskService {
         if(task.getFatherId() == null)
             return;
 
-        //否则看它本来的父任务是否还有子任务，没有的话需要把它设置为非父任务
+        //否则看它的父任务是否还有子任务，没有的话需要把它设置为非父任务
         List<Task> list = taskMapper.selectTasksByFatherId(task.getFatherId());
         if(list == null || list.size() == 0){
             task = new Task(task.getFatherId());
@@ -62,7 +59,7 @@ public class TaskServiceImpl implements TaskService {
 
     public void deleteAllTasksByGroupId(Integer gid) {
 
-        //先把该群的所有任务的父任务置为空，再删除这些任务
+        //先把该群的所有任务的父任务置为空，再统一删除这些任务
         taskMapper.clearTasksFatherIdInThisGroup(gid);
         taskMapper.deleteTasksByGroupId(gid);
     }

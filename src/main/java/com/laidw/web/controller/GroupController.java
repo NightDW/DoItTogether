@@ -89,7 +89,7 @@ public class GroupController {
     }
 
     /**
-     * 前往群组详细信息页面，该页面有两个标签页home和tasks，默认打开home页面
+     * 前往群组详细信息页面，该页面有两个标签页：home和tasks，默认打开home页面
      * @param gid 群组的id
      * @param goToTasks 是否直接打开tasks页面
      * @param msg 需要显示的消息，设置该参数主要是为了方便其它控制器方法调用本方法

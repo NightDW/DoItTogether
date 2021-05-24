@@ -26,6 +26,16 @@
         WHERE id = #{id}
     </sql>
 
+    <!-- WHERE host_id = #{hid} AND guest_id = #{gid} -->
+    <sql id="whereHG1">
+        WHERE host_id = #{hid} AND guest_id = #{gid}
+    </sql>
+
+    <!-- WHERE host_id = #{hostId} AND guest_id = #{guestPubInfo.id} -->
+    <sql id="whereHG2">
+        WHERE host_id = #{hostId} AND guest_id = #{guestPubInfo.id}
+    </sql>
+
     <!-- 无条件更新的SET语句 -->
     <sql id="updateSetting">
         remarks = #{remarks},
@@ -79,7 +89,7 @@
     <delete id="deleteFriendshipByHG">
         DELETE FROM
         <include refid="tableName" />
-        WHERE host_id = #{hid} AND guest_id = #{gid}
+        <include refid="whereHG1" />
     </delete>
 
     <update id="updateFriendshipByHGSelectively">
@@ -88,7 +98,7 @@
         <set>
             <include refid="updateSelectivelySetting" />
         </set>
-        WHERE host_id = #{hostId} AND guest_id = #{guestPubInfo.id}
+        <include refid="whereHG2" />
     </update>
 
     <update id="updateFriendshipByIdSelectively">
@@ -109,7 +119,7 @@
     <select id="selectFriendshipByHG" resultMap="friendshipMap">
         SELECT * FROM
         <include refid="tableName" />
-        WHERE host_id = #{hid} AND guest_id = #{gid}
+        <include refid="whereHG1" />
     </select>
 
     <select id="selectFriendshipsByHostId" resultMap="friendshipMap">

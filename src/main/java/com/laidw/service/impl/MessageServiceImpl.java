@@ -33,8 +33,8 @@ public class MessageServiceImpl implements MessageService {
     public int sendMsgReturnId(Boolean isPrivate, Integer senderId, Integer acceptorId, String content) {
         Message msg = new Message();
         msg.setIsPrivate(isPrivate);
-        msg.setAccId(acceptorId);
         msg.setSenderPubInfo(isPrivate ? new User(senderId) : new Membership(senderId));
+        msg.setAccId(acceptorId);
         msg.setSendTime(new Date());
         msg.setContent(content);
         messageMapper.insertMessage(msg);

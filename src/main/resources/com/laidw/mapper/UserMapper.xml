@@ -42,6 +42,9 @@
                 <when test="id == null &amp;&amp; username == null &amp;&amp; email == null &amp;&amp; phone != null">
                     phone = #{phone}
                 </when>
+                <when test="id == null &amp;&amp; username == null &amp;&amp; email == null &amp;&amp; phone == null &amp;&amp; role != null">
+                    role = #{role}
+                </when>
                 <otherwise>
                     id = 0
                 </otherwise>
@@ -119,12 +122,16 @@
 
     <!-- 全映射封装规则 -->
     <resultMap id="fullMap" type="com.laidw.entity.User" extends="onlyPubInfoMap">
+
         <collection property="friendships" column="id"
                     select="com.laidw.mapper.FriendshipMapper.selectFriendshipsByHostId" />
+
         <collection property="memberships" column="id"
                     select="com.laidw.mapper.MembershipMapper.selectMembershipsByUserId" />
+
         <collection property="acceptedTasks" column="id"
                     select="com.laidw.mapper.TaskMapper.selectTasksByAccUserId" />
+
     </resultMap>
 
     <!-- =============================定义封装规则============================= -->

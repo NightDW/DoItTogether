@@ -84,13 +84,18 @@
 
     </nav>
 
-    <!-- 用于取出各种提示信息，包括自定义的消息或登录失败时的错误消息 -->
+    <!-- 用于取出各种提示信息，比如自定义的消息或登录失败时的错误消息（注意loginError参数是我在SecurityConfig中自己指定的参数） -->
     <p id="top-msg" th:text="${msg == null ? '' : msg} + ${param.loginError == null || session.SPRING_SECURITY_LAST_EXCEPTION == null ? '' : session.SPRING_SECURITY_LAST_EXCEPTION.message}"></p>
 
 </div>
 
-<!-- 用于递归调用展示任务，提供给GroupTalk页面使用 -->
-<details th:attr="my-open=${task.status == 'Sons doing'}" th:fragment="showTaskList(list,level)" th:each="task : ${list}" th:class="'level' + ${level}">
+<!--
+    用于递归调用展示任务，提供给GroupTalk页面使用
+    th:attr="my-open=${xxxxxxxx}"表示：如果该任务是父任务，且有子任务尚未完成，则将details标签打开
+    th:class="'level' + ${level}"表示：如果当前任务在任务树的第level层，则将文本缩进(level - 1)个单位，方便查看
+    th:fragment="showTaskList(list, level)"表示：引用本片段时，除了要提供任务列表，还需要告诉该片段这些任务在第几层
+-->
+<details th:attr="my-open=${task.status == 'Sons doing'}" th:fragment="showTaskList(list, level)" th:each="task : ${list}" th:class="'level' + ${level}">
     <summary>
         <span th:style="'text-align: left; padding-left: ' + ${(level - 1) * 20 + 8} + 'px;'"><a th:href="@{/task/} + ${task.id}" th:text="${task.title}"></a></span>
         <span th:text="${task.content}"></span>
@@ -112,7 +117,7 @@
 </details>
 
 <!-- 用于递归调用展示任务，提供给TaskList页面使用，和上面的区别主要在于各种操作按钮上 -->
-<details th:attr="my-open=${task.status == 'Sons doing'}" th:fragment="showTaskList1(list,level)" th:each="task : ${list}" th:class="'level' + ${level}">
+<details th:attr="my-open=${task.status == 'Sons doing'}" th:fragment="showTaskList1(list, level)" th:each="task : ${list}" th:class="'level' + ${level}">
     <summary>
         <span th:style="'text-align: left; padding-left: ' + ${(level - 1) * 20 + 8} + 'px;'" th:text="${task.title}"></span>
         <span th:text="${task.content}"></span>
@@ -145,13 +150,14 @@
 
     //判断字符串是否没有数据
     function isEmptyStr(obj){
-        return (obj === undefined || typeof(obj) === "undefined" || obj == null || obj === "")
+        return (obj === undefined || typeof(obj) === "undefined" || obj == null || obj === "");
     }
 
     //字符串首字母变为大写
     function firstCharToBig(obj){
         return obj.charAt(0).toUpperCase() + obj.substr(1);
     }
+
 </script>
 
 </body>

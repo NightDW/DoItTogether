@@ -17,6 +17,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserService userService;
 
+    /**
+     * SpringSecurity通过该方法来获取某个用户名对应的用户信息
+     * @param username 用户名
+     * @return 用户信息
+     * @throws UsernameNotFoundException 查找不到指定的用户名时抛出该异常
+     */
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User condition = new User();
         condition.setUsername(username);

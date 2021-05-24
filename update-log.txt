@@ -2,13 +2,13 @@
 
 01 更新项目的preface文件，明确项目的功能，并确定需要创建的数据库的表；
 
-02 根据上述分析创建相应的实体类，配置连接池，编写SQL建表语句；
+02 根据preface文件中的分析来创建相应的实体类，配置连接池，编写SQL建表语句；
 
 03 开发Mapper并完成初步测试；
 
   - 可以先测试各个Mapper的增删改方法，待各个数据库表都已经有记录后再测试各个Mapper的查询方法；
 
-04 开发Service完成，并编写SystemUserConfig配置类（创建一个"DIT小助手"用户）；
+04 开发Service完成，并编写SystemUserConfig配置类（用于创建一个"DIT小助手"用户）；
 
 05 初步完成网页导航条的编写，额外编写MailService接口及其实现类来完成发送邮件业务；
 
@@ -28,7 +28,7 @@
 
   - User类实现UserDetails接口，编写UserDetailsService接口的实现类；
 
-  - 编写SecurityConfig类，指定使用自定义的登录页面和UserDetailsService实现类；
+  - 编写SecurityConfig类，使用自定义的登录页面和自定义的UserDetailsService实现类；
 
   - 编写base/login.html和base/index.html页面，BaseController添加相应的方法；
 
@@ -158,3 +158,4 @@
 
   - 新增ImageController，专门负责图片上传的业务（之前是由UserController和GroupController负责的）；
 
+40 继续重构代码，代码整体变化不大（2021/05/23）

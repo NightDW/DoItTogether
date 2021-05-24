@@ -23,9 +23,9 @@ public class Poster {
 
     /**
      * 获取模板邮件所需要的Map
-     * @param request HTTP请求对象
-     * @param seg 不包含主机名称的uri，不能以'/'开头
-     * @param user 用户信息，至少要有id、验证码和邮箱
+     * @param request HTTP请求对象，主要用于获取项目的根路径
+     * @param seg 不包含主机名称的uri，不能以'/'开头，主要用于获取项目的根路径
+     * @param user 用户信息，至少要有id和验证码
      * @return 模板邮件所需要的Map
      */
     private Map<String, Object> getEmailMap(HttpServletRequest request, String seg, User user){
@@ -40,8 +40,8 @@ public class Poster {
 
     /**
      * 发送验证邮件，由于模板不能解析@{}表达式，因此只能自己把验证链接拼接起来传递给模板，让模板直接取出
-     * @param request HTTP请求对象
-     * @param seg 不包含主机名称的uri，不能以'/'开头
+     * @param request HTTP请求对象，主要用于获取项目的根路径
+     * @param seg 不包含主机名称的uri，不能以'/'开头，主要用于获取项目的根路径
      * @param user 用户信息，至少要有id、验证码和邮箱
      * @throws Exception 可能抛出的异常
      */
@@ -52,8 +52,8 @@ public class Poster {
 
     /**
      * 发送找回邮件，由于模板不能解析@{}表达式，因此只能自己把验证链接拼接起来传递给模板，让模板直接取出
-     * @param request HTTP请求对象
-     * @param seg 不包含主机名称的uri，不能以'/'开头
+     * @param request HTTP请求对象，主要用于获取项目的根路径
+     * @param seg 不包含主机名称的uri，不能以'/'开头，主要用于获取项目的根路径
      * @param user 用户信息，至少要有id、验证码和邮箱
      * @throws Exception 可能抛出的异常
      */

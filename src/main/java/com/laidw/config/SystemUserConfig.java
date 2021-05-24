@@ -9,8 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 用于将系统通知用户从数据库中查询出来并放入IOC容器
- * 系统通知用户可用于给其他用户发送系统消息
+ * 用于将系统通知用户（DIT小助手）从数据库中查询出来并放入IOC容器
+ * 系统通知用户主要用于给其他用户发送系统消息
+ * 另外，当用户退出某个群组时，系统通知用户将会替代该用户，并继承该用户在该群中的所有数据
  */
 @Configuration
 public class SystemUserConfig {
@@ -51,18 +52,16 @@ public class SystemUserConfig {
     @Bean
     public User getSystemUser(){
 
-        //查询数据库中是否存在名称为指定用户名的用户
+        //查询数据库中是否存在系统用户
         User condition = new User();
-        condition.setUsername(username);
+        condition.setRole(Role.SYSTEM);
         User user = userMapper.selectUserPubInfoByCondition(condition);
 
-        //如果存在，则将查询结果放到IOC容器中
-        if(user != null){
-            //System.out.println("System User Id: " + user.getId());
+        //如果存在，则直接将查询结果放到IOC容器中并返回
+        if(user != null)
             return user;
-        }
 
-        //如果不存在，则先插入数据
+        //将配置文件中关于系统用户的配置封装成一个User对象
         User systemUserTemplate = new User();
         systemUserTemplate.setUsername(username);
         systemUserTemplate.setPassword(password);
@@ -74,9 +73,9 @@ public class SystemUserConfig {
         systemUserTemplate.setRole(Role.valueOf(roleName));
         systemUserTemplate.setIsValid(isValid);
         systemUserTemplate.setVerifyCode(verifyCode);
-        userMapper.insertUser(systemUserTemplate);
 
-        //System.out.println("System User Id: " + systemUserTemplate.getId());
+        //将系统用户数据插入数据库中，然后将该对象放到IOC容器中
+        userMapper.insertUser(systemUserTemplate);
         return systemUserTemplate;
     }
 }
